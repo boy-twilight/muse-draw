@@ -1,11 +1,11 @@
 import { RouteRecordRaw } from 'vue-router';
-import { PAGE_HOME } from '@/constants/page';
+import { PAGE_DRAW, PAGE_HOME } from '@/constants/page';
 
 export const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('@/layout/index.vue'),
-    redirect: PAGE_HOME,
+    redirect: PAGE_DRAW,
     children: [
       {
         path: 'home',

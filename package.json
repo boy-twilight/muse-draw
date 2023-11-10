@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --mode development --host",
+    "dev": "vite --host",
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
@@ -20,6 +20,7 @@
     "@antv/x6-plugin-stencil": "^2.1.4",
     "@antv/x6-plugin-transform": "^2.1.8",
     "axios": "^1.6.0",
+    "dayjs": "^1.11.10",
     "lyc-storage": "^1.0.4",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.7",

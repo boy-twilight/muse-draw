@@ -9,7 +9,9 @@
         ref="container"></div>
       <div class="operation">
         <div class="header">
-          <a-button type="primary">
+          <a-button
+            type="primary"
+            @click="save">
             <template #icon>
               <IconSave />
             </template>
@@ -42,20 +44,19 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, Ref, onMounted } from 'vue';
+import { ref, Ref, onMounted, nextTick } from 'vue';
 import { Graph, Shape } from '@antv/x6';
 import { Stencil } from '@antv/x6-plugin-stencil';
 import {
   showPorts,
-  createCircle,
-  createRect,
-  createPolygon,
+  createAllNodes,
   registerKeyEvents,
   registerNode,
   registerPlugin,
 } from './index';
 import { IconSave, IconExport } from '@arco-design/web-vue/es/icon';
 import { DrawHistory } from '@/types/Node';
+import { ls } from '@/utils';
 
 //绘图实例
 const graph = ref<Graph>();
@@ -72,44 +73,9 @@ const curDraw = ref<DrawHistory>({
   id: '',
 });
 
-//初始化侧边栏
-const initStencil = (graph: Graph) => {
-  const stencilIns = new Stencil({
-    title: '流程图',
-    target: graph,
-    stencilGraphWidth: 200,
-    stencilGraphHeight: 180,
-    collapsable: true,
-    groups: [
-      {
-        title: '图形',
-        name: 'node',
-      },
-    ],
-    layoutOptions: {
-      columns: 2,
-      columnWidth: 80,
-      rowHeight: 55,
-    },
-  });
-  const r1 = createRect(graph, { rx: 0, ry: 0 });
-  const r2 = createRect(graph, { rx: 6, ry: 6 });
-  const r3 = createRect(graph, { rx: 20, ry: 26 });
-  const r4 = createPolygon(graph, {
-    refPoints: '10,0 40,0 30,20 0,20',
-  });
-  const r5 = createPolygon(graph, {
-    refPoints: '0,10 10,0 20,10 10,20',
-  });
-  const r6 = createCircle(graph);
-  stencilIns.load([r1, r2, r3, r4, r5, r6], 'node');
-  stencil.value?.appendChild(stencilIns.container);
-};
-
-//初始化图
-const initGraph = (container: Ref<HTMLDivElement>): Graph => {
+const initGraph = (container: HTMLDivElement) => {
   return new Graph({
-    container: container.value,
+    container: container,
     grid: true,
     mousewheel: {
       enabled: true,
@@ -136,7 +102,7 @@ const initGraph = (container: Ref<HTMLDivElement>): Graph => {
         return new Shape.Edge({
           attrs: {
             line: {
-              stroke: '#A2B1C3',
+              stroke: '#000000',
               strokeWidth: 2,
               targetMarker: {
                 name: 'block',
@@ -166,30 +132,63 @@ const initGraph = (container: Ref<HTMLDivElement>): Graph => {
   });
 };
 
+//初始化侧边栏
+const initStencil = (graph: Graph) => {
+  const stencilIns = new Stencil({
+    title: '流程图',
+    target: graph,
+    stencilGraphWidth: 200,
+    stencilGraphHeight: 250,
+    collapsable: true,
+    groups: [
+      {
+        title: '图形',
+        name: 'node',
+      },
+    ],
+    layoutOptions: {
+      columns: 3,
+      columnWidth: 53,
+      rowHeight: 45,
+    },
+  });
+  stencilIns.load(createAllNodes(graph), 'node');
+  stencil.value?.appendChild(stencilIns.container);
+};
+
 const registerGraphEvents = (graph: Graph) => {
   graph.on('node:mouseenter', () => {
-    const container = document.getElementById('graph-container')!;
-    const ports = container.querySelectorAll(
+    const ports = container.value!.querySelectorAll(
       '.x6-port-body'
     ) as NodeListOf<SVGElement>;
     showPorts(ports, true);
   });
   graph.on('node:mouseleave', () => {
-    const container = document.getElementById('graph-container')!;
-    const ports = container.querySelectorAll(
+    const ports = container.value!.querySelectorAll(
       '.x6-port-body'
     ) as NodeListOf<SVGElement>;
     showPorts(ports, false);
   });
+  graph.on('node:click', ({ cell, node }) => {
+    const size = cell.getProp('size');
+    const data = cell.getAttrs();
+    console.log(node);
+    console.log(data);
+  });
+};
+
+const save = async () => {
+  const target = ls.get('user_data');
+  curDraw.value.data = JSON.stringify(graph.value!.toJSON().cells);
 };
 
 onMounted(() => {
   registerNode();
-  graph.value = initGraph(container as Ref<HTMLDivElement>);
-  initStencil(graph.value);
+  graph.value = initGraph(container.value as HTMLDivElement);
+  registerPlugin(graph.value as Graph);
+  initStencil(graph.value as Graph);
   registerGraphEvents(graph.value as Graph);
   registerKeyEvents(graph.value as Graph);
-  registerPlugin(graph.value as Graph);
 });
 </script>
 

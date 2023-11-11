@@ -9,5 +9,10 @@ export interface DrawHistory {
 export interface Node {
   width: number;
   height: number;
-  content: string;
+  label: string;
+  fontSize: number;
+  fontColor: number;
+  borderColor: string;
+  borderSize: number;
+  background: string;
 }

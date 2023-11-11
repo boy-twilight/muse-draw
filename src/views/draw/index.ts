@@ -121,10 +121,9 @@ export const registerPlugin = (graph: Graph) => {
 };
 
 export const registerKeyEvents = (graph: Graph) => {
-  console.log(1);
-
   //copy
   graph.bindKey(['meta+c', 'ctrl+c'], () => {
+    console.log(1);
     const cells = graph.getSelectedCells();
     if (cells.length) {
       graph.copy(cells);
@@ -196,19 +195,29 @@ export const registerNode = () => {
     'custom-rect',
     {
       inherit: 'rect',
-      width: 66,
-      height: 36,
+      width: 33,
+      height: 18,
       attrs: {
         body: {
-          strokeWidth: 1,
-          stroke: '#5F95FF',
-          fill: '#EFF4FF',
+          strokeWidth: 1.5,
+          stroke: '#000000',
+          fill: '#ffffff',
         },
         text: {
           fontSize: 12,
           fill: '#262626',
         },
       },
+      tools: [
+        {
+          name: 'node-editor',
+          args: {
+            attrs: {
+              backgroundColor: '#ffffff',
+            },
+          },
+        },
+      ],
       ports: { ...ports },
     },
     true
@@ -218,29 +227,31 @@ export const registerNode = () => {
     'custom-polygon',
     {
       inherit: 'polygon',
-      width: 66,
-      height: 36,
+      width: 33,
+      height: 18,
       attrs: {
         body: {
-          strokeWidth: 1,
-          stroke: '#5F95FF',
-          fill: '#EFF4FF',
+          strokeWidth: 1.5,
+          stroke: '#000000',
+          fill: '#ffffff',
         },
         text: {
           fontSize: 12,
           fill: '#262626',
         },
       },
+      tools: [
+        {
+          name: 'node-editor',
+          args: {
+            attrs: {
+              backgroundColor: '#ffffff',
+            },
+          },
+        },
+      ],
       ports: {
         ...ports,
-        items: [
-          {
-            group: 'top',
-          },
-          {
-            group: 'bottom',
-          },
-        ],
       },
     },
     true
@@ -250,29 +261,78 @@ export const registerNode = () => {
     'custom-circle',
     {
       inherit: 'circle',
-      width: 45,
-      height: 45,
+      width: 23,
+      height: 23,
       attrs: {
         body: {
-          strokeWidth: 1,
-          stroke: '#5F95FF',
-          fill: '#EFF4FF',
+          strokeWidth: 1.5,
+          stroke: '#000000',
+          fill: '#ffffff',
         },
         text: {
           fontSize: 12,
           fill: '#262626',
         },
       },
+      tools: [
+        {
+          name: 'node-editor',
+          args: {
+            attrs: {
+              backgroundColor: '#ffffff',
+            },
+          },
+        },
+      ],
+      ports: { ...ports },
+    },
+    true
+  );
+
+  Graph.registerNode(
+    'custom-ellipse',
+    {
+      inherit: 'ellipse',
+      width: 33,
+      height: 18,
+      attrs: {
+        body: {
+          strokeWidth: 1.5,
+          stroke: '#000000',
+          fill: '#ffffff',
+        },
+        text: {
+          fontSize: 12,
+          fill: '#262626',
+        },
+      },
+      tools: [
+        {
+          name: 'node-editor',
+          args: {
+            attrs: {
+              backgroundColor: '#ffffff',
+            },
+          },
+        },
+      ],
       ports: { ...ports },
     },
     true
   );
 };
 
-export const createPolygon = (graph: Graph, config: { refPoints: string }) => {
-  const { refPoints } = config;
+export const createPolygon = (
+  graph: Graph,
+  config: { refPoints: string; height?: number; width?: number }
+) => {
+  let { refPoints, width, height } = config;
+  width = width ? width : 33;
+  height = height ? height : 18;
   return graph.createNode({
     shape: 'custom-polygon',
+    width,
+    height,
     attrs: {
       body: {
         refPoints,
@@ -301,4 +361,50 @@ export const createCircle = (graph: Graph) => {
   return graph.createNode({
     shape: 'custom-circle',
   });
+};
+
+export const createEllipse = (graph: Graph) => {
+  return graph.createNode({
+    shape: 'custom-ellipse',
+  });
+};
+
+export const createAllNodes = (graph: Graph) => {
+  const r1 = createRect(graph, { rx: 0, ry: 0 });
+  const r2 = createRect(graph, { rx: 6, ry: 6 });
+  const r3 = createRect(graph, { rx: 10, ry: 13 });
+  const r4 = createEllipse(graph);
+  const r5 = createCircle(graph);
+  const r6 = createPolygon(graph, {
+    refPoints: '10,0 40,0 30,20 0,20',
+  });
+  const r7 = createPolygon(graph, {
+    refPoints: '0,10 10,0 20,10 10,20',
+  });
+  const r8 = createPolygon(graph, {
+    height: 20,
+    width: 20,
+    refPoints: '100,10 40,198 190,78 10,78 160,198',
+  });
+  const r9 = createPolygon(graph, {
+    refPoints: '0,0 1,0 0,1',
+  });
+  const r10 = createPolygon(graph, {
+    refPoints: '0.5,0 1,1 0,1',
+  });
+  const r11 = createPolygon(graph, {
+    height: 25,
+    refPoints: '0.5,0 1,0.38 0.82,1 0.18,1 0,0.38',
+  });
+  const r12 = createPolygon(graph, {
+    height: 28,
+    width: 28,
+    refPoints: '0.5,0 1,0.25 1,0.75 0.5,1 0,0.75 0,0.25',
+  });
+  const r13 = createPolygon(graph, {
+    height: 33,
+    refPoints:
+      '0.5,0 0.85,0.15 1,0.5 0.85,0.85 0.5,1 0.15,0.85 0,0.5 0.15,0.15',
+  });
+  return [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13];
 };

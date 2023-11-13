@@ -23,3 +23,8 @@ export const warning = (config: ModalConfig) => {
     onCancel,
   });
 };
+
+//格式化
+export const clone = (data: any): any => {
+  return JSON.parse(JSON.stringify(data));
+};

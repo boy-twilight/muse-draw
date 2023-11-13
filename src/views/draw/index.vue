@@ -44,7 +44,10 @@
             <a-tab-pane
               key="node"
               title="节点属性">
-              <GraphNodeForm :property="curNode" />
+              <GraphNodeForm
+                :property="curNode"
+                @change="onNodeFormChange"
+                v-show="curType == 'node'" />
             </a-tab-pane>
           </a-tabs>
         </a-card>
@@ -55,7 +58,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, nextTick } from 'vue';
-import { Graph, Shape } from '@antv/x6';
+import { Graph, Shape, Node, Cell } from '@antv/x6';
 import { Stencil } from '@antv/x6-plugin-stencil';
 import {
   showPorts,
@@ -95,7 +98,7 @@ const curDraw = ref<DrawHistory>({
 //当前操作的id
 const curId = ref<string>('');
 //当前节点的类型
-const curType = ref<string>('');
+const curType = ref<'node' | 'line'>('node');
 //当前操作的节点
 const curNode = ref<GraphNode>({
   width: 0,
@@ -105,6 +108,8 @@ const curNode = ref<GraphNode>({
   background: '',
   borderColor: '',
   borderSize: 0,
+  textAnchor: ['middle'],
+  textVerticalAlign: ['middle'],
 });
 //当前操作的连线
 const curLine = ref<GraphLine>({
@@ -116,6 +121,32 @@ const curLine = ref<GraphLine>({
 const curTab = ref<'draw' | 'node'>('draw');
 //全局属性表单的实例
 const drawForm = ref<InstanceType<typeof DrawForm>>();
+
+//获取节点信息
+const getNodeInfo = (cell: Cell<Node.Properties>) => {
+  //切换表单
+  curId.value = cell.id;
+  curType.value = 'node';
+  curTab.value = 'node';
+  //读取节点属性
+  const attrs = cell.getAttrs();
+  const { width, height } = cell.getProp('size')!;
+  const {
+    body: { fill, stroke, strokeWidth },
+    text: { fill: fontColor, fontSize, textAnchor, textVerticalAlign },
+  } = attrs;
+  curNode.value = {
+    width,
+    height,
+    fontSize: Number(fontSize),
+    fontColor: String(fontColor),
+    borderColor: String(stroke),
+    borderSize: Number(strokeWidth),
+    background: String(fill),
+    textAnchor: [String(textAnchor)],
+    textVerticalAlign: [String(textVerticalAlign)],
+  };
+};
 
 //初始化画布
 const initGraph = (container: HTMLDivElement) => {
@@ -214,25 +245,44 @@ const registerGraphEvents = (graph: Graph) => {
     ) as NodeListOf<SVGElement>;
     showPorts(ports, false);
   });
+  //点击节点时获取节点信息
   graph.on('node:click', ({ cell }) => {
     if (curId.value == cell.id) return;
-    curId.value = cell.id;
-    const attrs = cell.getAttrs();
-    const { width, height } = cell.getProp('size')!;
-    const {
-      body: { fill, stroke, strokeWidth },
-      text: { fill: fontColor, fontSize, textAnchor, textVerticalAlign },
-    } = attrs;
-    curNode.value = {
-      width,
+    getNodeInfo(cell);
+  });
+  //新增节点时获取节点信息，顺便改变节点大小
+  graph.on('node:added', ({ cell }) => {
+    let { height, width } = cell.getProp('size');
+    height *= 3;
+    width *= 3;
+    cell.setProp('size', {
       height,
-      fontSize: Number(fontSize),
-      fontColor: String(fontColor),
-      borderColor: String(stroke),
-      borderSize: Number(strokeWidth),
-      background: String(fill),
-    };
+      width,
+    });
+    getNodeInfo(cell);
+  });
+  //节点大小改变时，更新值
+  graph.on('node:change:size', ({ cell }) => {
+    if (curId.value != cell.id) return;
+    const { height, width } = cell.getProp('size');
+    curNode.value.height = height;
+    curNode.value.width = width;
+  });
+  //点击边时获取边的信息
+  graph.on('edge:click', ({ cell }) => {
+    curId.value = cell.id;
     curTab.value = 'node';
+    curType.value = 'line';
+    const attrs = cell.getAttrs();
+    const {
+      line: { stroke, strokeWidth },
+    } = attrs;
+    curLine.value = {
+      strokeWidth: Number(strokeWidth),
+      strokeColor: String(stroke),
+      lineType: '',
+    };
+    console.log(attrs);
   });
 };
 
@@ -250,6 +300,35 @@ const exportGraph = (value: any) => {
   } else {
     graph.value!.exportSVG();
   }
+};
+
+const onNodeFormChange = (val: GraphNode) => {
+  curNode.value = val;
+  const cell = graph.value!.getCellById(curId.value);
+  const {
+    background,
+    borderColor,
+    borderSize,
+    fontColor,
+    fontSize,
+    textAnchor,
+    textVerticalAlign,
+    height,
+    width,
+  } = curNode.value;
+  cell.setAttrs({
+    body: { fill: background, stroke: borderColor, strokeWidth: borderSize },
+    text: {
+      fill: fontColor,
+      fontSize,
+      textAnchor: textAnchor[0],
+      textVerticalAlign: textVerticalAlign[0],
+    },
+  });
+  cell.setProp('size', {
+    width,
+    height,
+  });
 };
 
 //获取页面初始值

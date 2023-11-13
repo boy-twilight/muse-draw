@@ -8,8 +8,9 @@ import { Clipboard } from '@antv/x6-plugin-clipboard';
 import { History } from '@antv/x6-plugin-history';
 import { Scroller } from '@antv/x6-plugin-scroller';
 import { Export } from '@antv/x6-plugin-export';
+import { clone } from '@/utils';
 
-export const ports = {
+const ports = {
   groups: {
     top: {
       position: 'top',
@@ -86,6 +87,40 @@ export const ports = {
       group: 'left',
     },
   ],
+};
+const tools = [
+  {
+    name: 'node-editor',
+    args: {
+      attrs: {
+        backgroundColor: '#ffffff',
+        text: {
+          fontSize: 15,
+        },
+      },
+    },
+  },
+];
+const attrs = {
+  body: {
+    strokeWidth: 1.5,
+    stroke: '#000000',
+    fill: '#ffffff',
+  },
+  text: {
+    fontSize: 12,
+    fill: '#262626',
+    textAlign: 'middle',
+    textVerticalAlign: 'middle',
+  },
+  label: {
+    textWrap: {
+      width: '90%',
+      height: '90%',
+      ellipsis: true,
+      breakWord: true,
+    },
+  },
 };
 
 export const showPorts = (ports: NodeListOf<SVGElement>, show: boolean) => {
@@ -197,38 +232,9 @@ export const registerNode = () => {
       inherit: 'rect',
       width: 33,
       height: 18,
-      attrs: {
-        body: {
-          strokeWidth: 1.5,
-          stroke: '#000000',
-          fill: '#ffffff',
-        },
-        text: {
-          fontSize: 12,
-          fill: '#262626',
-          textAlign: 'middle',
-          textVerticalAlign: 'middle',
-        },
-        label: {
-          textWrap: {
-            width: '90%', // 宽度减少 10px
-            height: '90%', // 高度为参照元素高度的一半
-            ellipsis: true, // 文本超出显示范围时，自动添加省略号
-            breakWord: true, // 是否截断单词
-          },
-        },
-      },
-      tools: [
-        {
-          name: 'node-editor',
-          args: {
-            attrs: {
-              backgroundColor: '#ffffff',
-            },
-          },
-        },
-      ],
-      ports: { ...ports },
+      attrs: clone(attrs),
+      tools: clone(tools),
+      ports: clone(ports),
     },
     true
   );
@@ -239,40 +245,9 @@ export const registerNode = () => {
       inherit: 'polygon',
       width: 33,
       height: 18,
-      attrs: {
-        body: {
-          strokeWidth: 1.5,
-          stroke: '#000000',
-          fill: '#ffffff',
-        },
-        text: {
-          fontSize: 12,
-          fill: '#262626',
-          textAlign: 'middle',
-          textVerticalAlign: 'middle',
-        },
-        label: {
-          textWrap: {
-            width: '90%', // 宽度减少 10px
-            height: '90%', // 高度为参照元素高度的一半
-            ellipsis: true, // 文本超出显示范围时，自动添加省略号
-            breakWord: true, // 是否截断单词
-          },
-        },
-      },
-      tools: [
-        {
-          name: 'node-editor',
-          args: {
-            attrs: {
-              backgroundColor: '#ffffff',
-            },
-          },
-        },
-      ],
-      ports: {
-        ...ports,
-      },
+      attrs: clone(attrs),
+      tools: clone(tools),
+      ports: clone(ports),
     },
     true
   );
@@ -283,38 +258,9 @@ export const registerNode = () => {
       inherit: 'circle',
       width: 23,
       height: 23,
-      attrs: {
-        body: {
-          strokeWidth: 1.5,
-          stroke: '#000000',
-          fill: '#ffffff',
-        },
-        text: {
-          fontSize: 12,
-          fill: '#262626',
-          textAlign: 'middle',
-          textVerticalAlign: 'middle',
-        },
-        label: {
-          textWrap: {
-            width: '90%', // 宽度减少 10px
-            height: '90%', // 高度为参照元素高度的一半
-            ellipsis: true, // 文本超出显示范围时，自动添加省略号
-            breakWord: true, // 是否截断单词
-          },
-        },
-      },
-      tools: [
-        {
-          name: 'node-editor',
-          args: {
-            attrs: {
-              backgroundColor: '#ffffff',
-            },
-          },
-        },
-      ],
-      ports: { ...ports },
+      attrs: clone(attrs),
+      tools: clone(tools),
+      ports: clone(ports),
     },
     true
   );
@@ -325,38 +271,9 @@ export const registerNode = () => {
       inherit: 'ellipse',
       width: 33,
       height: 18,
-      attrs: {
-        body: {
-          strokeWidth: 1.5,
-          stroke: '#000000',
-          fill: '#ffffff',
-        },
-        text: {
-          fontSize: 12,
-          fill: '#262626',
-          textAlign: 'middle',
-          textVerticalAlign: 'middle',
-        },
-        label: {
-          textWrap: {
-            width: '90%',
-            height: '90%',
-            ellipsis: true,
-            breakWord: true,
-          },
-        },
-      },
-      tools: [
-        {
-          name: 'node-editor',
-          args: {
-            attrs: {
-              backgroundColor: '#ffffff',
-            },
-          },
-        },
-      ],
-      ports: { ...ports },
+      attrs: clone(attrs),
+      tools: clone(tools),
+      ports: clone(ports),
     },
     true
   );

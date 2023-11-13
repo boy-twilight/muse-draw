@@ -3,7 +3,15 @@
     <a-card>
       <div class="header">
         <div class="left">
-          <a-button>批量操作</a-button>
+          <a-button
+            type="primary"
+            status="danger"
+            @click="deleteSelect">
+            <template #icon>
+              <IconDelete />
+            </template>
+            批量删除
+          </a-button>
         </div>
         <div class="right">
           <a-input-search
@@ -13,8 +21,8 @@
       </div>
       <a-table
         :data="curShow"
-        row-key="id"
         :pagination="false"
+        row-key="id"
         v-model:selected-keys="curKeys"
         :row-selection="{
           showCheckedAll: true,
@@ -80,27 +88,17 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { DrawHistory } from '@/types/Node';
 import { IconEdit, IconDelete } from '@arco-design/web-vue/es/icon';
-import { ls, format } from '@/utils';
+import { Message, Modal } from '@arco-design/web-vue';
+import { ls, warning } from '@/utils';
 import { useRouter } from 'vue-router';
 import { PAGE_DRAW } from '@/constants/page';
-import { onMounted } from 'vue';
 
 const router = useRouter();
 //用户的操作历史
-const history = reactive<DrawHistory[]>(
-  ls.get('user_data') || [
-    {
-      name: '测试',
-      desc: '测试',
-      data: 's',
-      lastUpdate: format(new Date()),
-      id: 'randow',
-    },
-  ]
-);
+const history = ref<DrawHistory[]>(ls.get('user_data') || []);
 //当前的选择的列的key
 const curKeys = ref<string[]>([]);
 //搜索关键字
@@ -111,19 +109,37 @@ const curPage = ref<number>(1);
 const pageSize = ref<number>(10);
 //当前显示的表格
 const curShow = computed(() =>
-  history
+  history.value
     .filter((item) => item.name.includes(keyWords.value))
     .slice((curPage.value - 1) * pageSize.value, curPage.value * pageSize.value)
 );
 
+//删除历史记录
 const deleteHistory = (id: string) => {
-  const index = history.findIndex((item) => item.id == id);
-  history.splice(index, 1);
+  const index = history.value.findIndex((item) => item.id == id);
+  history.value.splice(index, 1);
+};
+
+//批量删除历史记录
+const deleteSelect = () => {
+  if (curKeys.value.length == 0)
+    return Message.error('请先选中需要删除的绘图记录！');
+  warning({
+    title: '批量删除选择',
+    content: '确认批量删除选中的绘图记录吗，此操作不可撤销',
+    onOk: () => {
+      history.value = history.value.filter(
+        (item) => !curKeys.value.includes(item.id)
+      );
+      curKeys.value = [];
+    },
+    onCancel: () => {},
+  });
 };
 
 onMounted(() => {
   window.addEventListener('beforeunload', () => {
-    ls.set('user_data', history);
+    ls.set('user_data', history.value);
   });
 });
 </script>

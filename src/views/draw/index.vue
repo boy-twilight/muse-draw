@@ -17,19 +17,24 @@
             </template>
             保存
           </a-button>
-          <a-button>
-            <template #icon>
-              <icon-export />
-            </template>
-            导出
-          </a-button>
+          <a-dropdown>
+            <a-button>
+              <template #icon>
+                <icon-export />
+              </template>
+              导出
+            </a-button>
+          </a-dropdown>
         </div>
         <a-card class="property">
-          <a-tabs default-active-key="global">
+          <a-tabs v-model:active-key="curTab">
             <a-tab-pane
-              key="global"
-              title="全局属性">
-              Content of Tab Panel 1
+              key="draw"
+              title="绘图信息">
+              <DrawForm
+                v-model:model="curDraw"
+                @change="getFormValue"
+                ref="drawForm" />
             </a-tab-pane>
             <a-tab-pane
               key="node"
@@ -44,7 +49,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, Ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Graph, Shape } from '@antv/x6';
 import { Stencil } from '@antv/x6-plugin-stencil';
 import {
@@ -54,10 +59,20 @@ import {
   registerNode,
   registerPlugin,
 } from './index';
+import { v4 } from 'uuid';
 import { IconSave, IconExport } from '@arco-design/web-vue/es/icon';
+import { Message } from '@arco-design/web-vue';
+import { useRoute } from 'vue-router';
 import { DrawHistory } from '@/types/Node';
-import { ls } from '@/utils';
+import { ls, format } from '@/utils';
+import DrawForm from './package/DrawForm.vue';
+import { onBeforeRouteLeave } from 'vue-router';
 
+//拿到用户数据
+const userData = ls.get('user_data') as DrawHistory[];
+//拿到路由参数
+const route = useRoute();
+const id = route.query.id + '';
 //绘图实例
 const graph = ref<Graph>();
 //绘图容器
@@ -72,7 +87,12 @@ const curDraw = ref<DrawHistory>({
   lastUpdate: '',
   id: '',
 });
+//当前操作的属性tab
+const curTab = ref<'draw' | 'node'>('draw');
+//全局属性表单的实例
+const drawForm = ref<InstanceType<typeof DrawForm>>();
 
+//初始化画布
 const initGraph = (container: HTMLDivElement) => {
   return new Graph({
     container: container,
@@ -177,18 +197,49 @@ const registerGraphEvents = (graph: Graph) => {
   });
 };
 
-const save = async () => {
-  const target = ls.get('user_data');
-  curDraw.value.data = JSON.stringify(graph.value!.toJSON().cells);
+//获取表单值
+const getFormValue = (key: string, value: string) => {
+  curDraw.value[key as keyof DrawHistory] = value;
 };
 
+//获取页面初始值
+const getPageVal = () => {
+  if (id.length < 16) return;
+  curDraw.value = userData.find((item) => item.id == id) as DrawHistory;
+};
+
+//保存作图
+const save = async () => {
+  const res = await drawForm.value?.validate();
+  if (res) {
+    curTab.value = 'draw';
+    return Message.error('请填写完整绘图名称和绘图备注后，在进行保存！');
+  }
+  curDraw.value.data = JSON.stringify(graph.value!.toJSON());
+  curDraw.value.lastUpdate = format(new Date());
+  const index = userData.findIndex((item) => item.id == id);
+  if (index != -1) {
+    userData[index] = curDraw.value;
+    Message.success('修改保存成功！');
+  } else {
+    curDraw.value.id = v4();
+    userData.push(curDraw.value);
+    Message.success('新增保存成功！');
+  }
+};
+
+onBeforeRouteLeave(() => {
+  ls.set('user_data', userData);
+});
+
 onMounted(() => {
+  getPageVal();
   registerNode();
   graph.value = initGraph(container.value as HTMLDivElement);
   registerPlugin(graph.value as Graph);
   initStencil(graph.value as Graph);
-  registerGraphEvents(graph.value as Graph);
   registerKeyEvents(graph.value as Graph);
+  registerGraphEvents(graph.value as Graph);
 });
 </script>
 

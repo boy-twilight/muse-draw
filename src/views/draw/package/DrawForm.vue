@@ -32,7 +32,7 @@
 
 <script lang="ts" setup>
 import { reactive, toRefs, ref } from 'vue';
-import { DrawHistory } from '@/types/Node';
+import { DrawHistory } from '@/types/node';
 import { Form, ValidatedError, FieldRule } from '@arco-design/web-vue';
 
 const props = defineProps<{

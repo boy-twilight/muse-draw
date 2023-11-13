@@ -33,7 +33,7 @@ export default defineConfig({
   },
   server: {
     open: true,
-    port: 3030,
+    port: 4000,
   },
   build: {
     chunkSizeWarningLimit: 1000,

@@ -1,11 +1,11 @@
 import { RouteRecordRaw } from 'vue-router';
-import { PAGE_DRAW, PAGE_HOME } from '@/constants/page';
+import { PAGE_HOME } from '@/constants/page';
 
 export const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('@/layout/index.vue'),
-    redirect: PAGE_DRAW,
+    redirect: PAGE_HOME,
     children: [
       {
         path: 'home',
@@ -16,7 +16,7 @@ export const routes: RouteRecordRaw[] = [
       },
       {
         path: 'draw',
-        component: import('@/views/draw/index.vue'),
+        component: () => import('@/views/draw/index.vue'),
         meta: {
           title: '绘画',
         },

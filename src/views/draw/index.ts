@@ -206,6 +206,16 @@ export const registerNode = () => {
         text: {
           fontSize: 12,
           fill: '#262626',
+          textAlign: 'middle',
+          textVerticalAlign: 'middle',
+        },
+        label: {
+          textWrap: {
+            width: '90%', // 宽度减少 10px
+            height: '90%', // 高度为参照元素高度的一半
+            ellipsis: true, // 文本超出显示范围时，自动添加省略号
+            breakWord: true, // 是否截断单词
+          },
         },
       },
       tools: [
@@ -238,6 +248,16 @@ export const registerNode = () => {
         text: {
           fontSize: 12,
           fill: '#262626',
+          textAlign: 'middle',
+          textVerticalAlign: 'middle',
+        },
+        label: {
+          textWrap: {
+            width: '90%', // 宽度减少 10px
+            height: '90%', // 高度为参照元素高度的一半
+            ellipsis: true, // 文本超出显示范围时，自动添加省略号
+            breakWord: true, // 是否截断单词
+          },
         },
       },
       tools: [
@@ -272,6 +292,16 @@ export const registerNode = () => {
         text: {
           fontSize: 12,
           fill: '#262626',
+          textAlign: 'middle',
+          textVerticalAlign: 'middle',
+        },
+        label: {
+          textWrap: {
+            width: '90%', // 宽度减少 10px
+            height: '90%', // 高度为参照元素高度的一半
+            ellipsis: true, // 文本超出显示范围时，自动添加省略号
+            breakWord: true, // 是否截断单词
+          },
         },
       },
       tools: [
@@ -304,6 +334,16 @@ export const registerNode = () => {
         text: {
           fontSize: 12,
           fill: '#262626',
+          textAlign: 'middle',
+          textVerticalAlign: 'middle',
+        },
+        label: {
+          textWrap: {
+            width: '90%',
+            height: '90%',
+            ellipsis: true,
+            breakWord: true,
+          },
         },
       },
       tools: [

@@ -17,13 +17,18 @@
             </template>
             保存
           </a-button>
-          <a-dropdown>
+          <a-dropdown @select="exportGraph">
             <a-button>
               <template #icon>
                 <icon-export />
               </template>
               导出
             </a-button>
+            <template #content>
+              <a-doption value="png">PNG格式</a-doption>
+              <a-doption value="jpeg">JPEG格式</a-doption>
+              <a-doption value="svg">SVG格式</a-doption>
+            </template>
           </a-dropdown>
         </div>
         <a-card class="property">
@@ -39,7 +44,7 @@
             <a-tab-pane
               key="node"
               title="节点属性">
-              Content of Tab Panel 2
+              <GraphNodeForm :property="curNode" />
             </a-tab-pane>
           </a-tabs>
         </a-card>
@@ -49,7 +54,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import { Graph, Shape } from '@antv/x6';
 import { Stencil } from '@antv/x6-plugin-stencil';
 import {
@@ -62,14 +67,14 @@ import {
 import { v4 } from 'uuid';
 import { IconSave, IconExport } from '@arco-design/web-vue/es/icon';
 import { Message } from '@arco-design/web-vue';
-import { useRoute } from 'vue-router';
-import { DrawHistory } from '@/types/Node';
+import { useRoute, onBeforeRouteLeave } from 'vue-router';
+import { DrawHistory, GraphNode, GraphLine } from '@/types/node';
 import { ls, format } from '@/utils';
 import DrawForm from './package/DrawForm.vue';
-import { onBeforeRouteLeave } from 'vue-router';
+import GraphNodeForm from './package/GraphNodeForm.vue';
 
 //拿到用户数据
-const userData = ls.get('user_data') as DrawHistory[];
+const userData = (ls.get('user_data') as DrawHistory[]) || [];
 //拿到路由参数
 const route = useRoute();
 const id = route.query.id + '';
@@ -86,6 +91,26 @@ const curDraw = ref<DrawHistory>({
   data: '',
   lastUpdate: '',
   id: '',
+});
+//当前操作的id
+const curId = ref<string>('');
+//当前节点的类型
+const curType = ref<string>('');
+//当前操作的节点
+const curNode = ref<GraphNode>({
+  width: 0,
+  height: 0,
+  fontColor: '',
+  fontSize: 0,
+  background: '',
+  borderColor: '',
+  borderSize: 0,
+});
+//当前操作的连线
+const curLine = ref<GraphLine>({
+  strokeColor: '',
+  strokeWidth: 0,
+  lineType: '',
 });
 //当前操作的属性tab
 const curTab = ref<'draw' | 'node'>('draw');
@@ -189,11 +214,25 @@ const registerGraphEvents = (graph: Graph) => {
     ) as NodeListOf<SVGElement>;
     showPorts(ports, false);
   });
-  graph.on('node:click', ({ cell, node }) => {
-    const size = cell.getProp('size');
-    const data = cell.getAttrs();
-    console.log(node);
-    console.log(data);
+  graph.on('node:click', ({ cell }) => {
+    if (curId.value == cell.id) return;
+    curId.value = cell.id;
+    const attrs = cell.getAttrs();
+    const { width, height } = cell.getProp('size')!;
+    const {
+      body: { fill, stroke, strokeWidth },
+      text: { fill: fontColor, fontSize, textAnchor, textVerticalAlign },
+    } = attrs;
+    curNode.value = {
+      width,
+      height,
+      fontSize: Number(fontSize),
+      fontColor: String(fontColor),
+      borderColor: String(stroke),
+      borderSize: Number(strokeWidth),
+      background: String(fill),
+    };
+    curTab.value = 'node';
   });
 };
 
@@ -202,10 +241,30 @@ const getFormValue = (key: string, value: string) => {
   curDraw.value[key as keyof DrawHistory] = value;
 };
 
+//导出图
+const exportGraph = (value: any) => {
+  if (value == 'png') {
+    graph.value!.exportPNG();
+  } else if (value == 'jpeg') {
+    graph.value!.exportJPEG();
+  } else {
+    graph.value!.exportSVG();
+  }
+};
+
 //获取页面初始值
 const getPageVal = () => {
   if (id.length < 16) return;
   curDraw.value = userData.find((item) => item.id == id) as DrawHistory;
+  const nodes = JSON.parse(curDraw.value.data) as any[];
+  nodes.forEach((item) => {
+    const { shape } = item;
+    if (shape == 'edge') {
+      graph.value?.addEdge(item);
+    } else {
+      graph.value?.addNode(item);
+    }
+  });
 };
 
 //保存作图
@@ -215,7 +274,7 @@ const save = async () => {
     curTab.value = 'draw';
     return Message.error('请填写完整绘图名称和绘图备注后，在进行保存！');
   }
-  curDraw.value.data = JSON.stringify(graph.value!.toJSON());
+  curDraw.value.data = JSON.stringify(graph.value!.toJSON().cells);
   curDraw.value.lastUpdate = format(new Date());
   const index = userData.findIndex((item) => item.id == id);
   if (index != -1) {
@@ -228,18 +287,25 @@ const save = async () => {
   }
 };
 
-onBeforeRouteLeave(() => {
-  ls.set('user_data', userData);
-});
-
-onMounted(() => {
-  getPageVal();
+//初始化页面
+const initPage = async () => {
   registerNode();
   graph.value = initGraph(container.value as HTMLDivElement);
   registerPlugin(graph.value as Graph);
   initStencil(graph.value as Graph);
   registerKeyEvents(graph.value as Graph);
   registerGraphEvents(graph.value as Graph);
+  await nextTick();
+  getPageVal();
+};
+
+//离开路由的时候重新设置
+onBeforeRouteLeave(() => {
+  ls.set('user_data', userData);
+});
+
+onMounted(() => {
+  initPage();
 });
 </script>
 

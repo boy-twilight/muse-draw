@@ -6,17 +6,17 @@
         @menu-item-click="handleClick"
         class="menu">
         <div class="title"><img :src="logo" /><span>muse draw</span></div>
-        <a-menu-item :key="PAGE_DRAW">
-          <template #icon>
-            <IconPen />
-          </template>
-          绘画
-        </a-menu-item>
         <a-menu-item :key="PAGE_HOME">
           <template #icon>
             <IconHistory />
           </template>
           记录
+        </a-menu-item>
+        <a-menu-item :key="PAGE_DRAW">
+          <template #icon>
+            <IconPen />
+          </template>
+          绘画
         </a-menu-item>
       </a-menu>
     </a-layout-sider>
@@ -45,7 +45,7 @@ import { ss } from '@/utils';
 import logo from '@/assets/icon/logo.svg';
 
 const router = useRouter();
-const curKey = ref<string[]>(ss.get('curKey') || [PAGE_DRAW]);
+const curKey = ref<string[]>(ss.get('curKey') || [PAGE_HOME]);
 const handleClick = (key: string) => {
   if (curKey.value[0] == key) return;
   curKey.value = [key];

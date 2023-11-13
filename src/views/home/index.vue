@@ -89,7 +89,7 @@
 
 <script lang="ts" setup>
 import { ref, computed, onMounted } from 'vue';
-import { DrawHistory } from '@/types/Node';
+import { DrawHistory } from '@/types/node';
 import { IconEdit, IconDelete } from '@arco-design/web-vue/es/icon';
 import { Message, Modal } from '@arco-design/web-vue';
 import { ls, warning } from '@/utils';
@@ -137,6 +137,7 @@ const deleteSelect = () => {
   });
 };
 
+//刷新或者退出浏览器时，保存记录
 onMounted(() => {
   window.addEventListener('beforeunload', () => {
     ls.set('user_data', history.value);

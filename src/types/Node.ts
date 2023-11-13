@@ -6,17 +6,18 @@ export interface DrawHistory {
   lastUpdate: string;
 }
 
-export interface Node {
+export interface GraphNode {
   width: number;
   height: number;
   fontSize: number;
-  fontColor: number;
+  fontColor: string;
   borderColor: string;
   borderSize: number;
   background: string;
 }
 
-export interface line {
-  strokeColor: number;
+export interface GraphLine {
+  strokeColor: string;
   strokeWidth: number;
+  lineType: string;
 }

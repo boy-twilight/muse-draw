@@ -69,6 +69,7 @@ import { FieldRule, SelectOption } from '@arco-design/web-vue';
 import { ref, toRefs, watch } from 'vue';
 import { ColorPicker } from 'vue3-colorpicker';
 import 'vue3-colorpicker/style.css';
+import { isEqual } from 'lodash-es';
 
 const props = defineProps<{
   property: GraphLine;
@@ -179,7 +180,9 @@ watch(
 watch(
   line,
   (val) => {
-    emits('change', val);
+    if (!isEqual(val, property.value)) {
+      emits('change', val);
+    }
   },
   {
     deep: true,

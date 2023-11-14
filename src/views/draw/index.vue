@@ -142,7 +142,6 @@ const getNodeProperty = (cell: Cell<Node.Properties>) => {
   //切换表单
   curId.value = cell.id;
   curType.value = 'node';
-  curTab.value = 'node';
   //读取节点属性
   const attrs = cell.getAttrs();
   const { width, height } = cell.getProp('size')!;
@@ -165,8 +164,9 @@ const getNodeProperty = (cell: Cell<Node.Properties>) => {
 
 //获取线条信息
 const getLineProperty = (cell: Cell<Node.Properties>) => {
+  curId.value = cell.id;
+  curType.value = 'line';
   const attrs = cell.getAttrs();
-  console.log(attrs);
   const {
     line: { stroke, strokeWidth, sourceMarker, targetMarker },
   } = attrs;
@@ -244,7 +244,7 @@ const onLinePropertyChange = (val: GraphLine) => {
           stroke: strokeColor,
           fill: strokeColor,
         };
-  cell.setAttrs({
+  cell.replaceAttrs({
     line: {
       stroke: strokeColor,
       strokeWidth,
@@ -252,6 +252,7 @@ const onLinePropertyChange = (val: GraphLine) => {
       targetMarker: targetMarkerData,
     },
   });
+  cell.setProp('sourceMarker');
 };
 
 //获取表单值
@@ -335,10 +336,10 @@ const initGraph = (container: HTMLDivElement) => {
         radius: 20,
       },
       createEdge() {
-        return new Shape.Edge({
+        const edge = new Shape.Edge({
           attrs: {
             line: {
-              stroke: '#000000',
+              stroke: '#000',
               strokeWidth: 2,
               targetMarker: {
                 name: 'block',
@@ -349,6 +350,12 @@ const initGraph = (container: HTMLDivElement) => {
           },
           zIndex: 0,
         });
+        //获取线条样式
+        curId.value = edge.id;
+        curTab.value = 'node';
+        curType.value = 'line';
+        getLineProperty(edge);
+        return edge;
       },
       validateConnection({ targetMagnet }) {
         return !!targetMagnet;
@@ -421,6 +428,7 @@ const registerGraphEvents = (graph: Graph) => {
   });
   //点击节点时获取节点信息
   graph.on('node:click', ({ cell }) => {
+    curTab.value = 'node';
     if (curId.value == cell.id) return;
     getNodeProperty(cell);
   });
@@ -431,18 +439,16 @@ const registerGraphEvents = (graph: Graph) => {
     curNode.value.height = height;
     curNode.value.width = width;
   });
+  //点击边时获取边的信息
+  graph.on('edge:click', ({ cell }) => {
+    curTab.value = 'node';
+    if (curId.value == cell.id) return;
+    getLineProperty(cell);
+  });
   //节点删除时，删除属性
   graph.on('node:removed', ({ cell }) => {
     if (cell.id != curId.value) return;
     curId.value = '';
-  });
-  //点击边时获取边的信息
-  graph.on('edge:click', ({ cell }) => {
-    if (curId.value == cell.id) return;
-    curId.value = cell.id;
-    curTab.value = 'node';
-    curType.value = 'line';
-    getLineProperty(cell);
   });
   //边删除时，判断删除属性
   graph.on('edge:removed', ({ cell }) => {

@@ -131,6 +131,8 @@ const curLine = ref<GraphLine>({
   markerWidth: 0,
   sourceMarker: '',
   targetMarker: '',
+  fontSize: 0,
+  fontColor: '',
 });
 //当前操作的属性tab
 const curTab = ref<'draw' | 'node'>('draw');
@@ -181,6 +183,8 @@ const getLineProperty = (cell: Cell<Node.Properties>) => {
     targetMarker: targetName ? targetName : 'none',
     markerHeight: height ? height : 0,
     markerWidth: width ? width : 0,
+    fontColor: '',
+    fontSize: 0,
   };
 };
 
@@ -321,6 +325,11 @@ const initGraph = (container: HTMLDivElement) => {
       minScale: 0.2,
       maxScale: 3,
     },
+    interacting: {
+      edgeLabelMovable: true,
+      edgeMovable: true,
+      arrowheadMovable: true,
+    },
     connecting: {
       router: 'manhattan',
       connector: {
@@ -345,6 +354,26 @@ const initGraph = (container: HTMLDivElement) => {
                 name: 'block',
                 width: 12,
                 height: 8,
+              },
+            },
+          },
+          tools: [
+            {
+              name: 'edge-editor',
+              args: {
+                attrs: {
+                  text: {
+                    fontSize: 15,
+                  },
+                },
+              },
+            },
+          ],
+          defaultLabel: {
+            attrs: {
+              text: {
+                fill: '#FF0000', // 设置所有标签的颜色为红色
+                fontSize: 18, // 设置所有标签的文字大小
               },
             },
           },
@@ -398,9 +427,10 @@ const initStencil = (graph: Graph) => {
     getDropNode(node) {
       const size = node.size();
       const clone = node.clone().size({
-        height: size.height * 3,
-        width: size.width * 3,
+        height: size.height * 2,
+        width: size.width * 2,
       });
+      curTab.value = 'node';
       //获取node信息
       getNodeProperty(clone);
       return clone;
@@ -455,6 +485,20 @@ const registerGraphEvents = (graph: Graph) => {
     if (cell.id != curId.value) return;
     curId.value = '';
   });
+  // graph.on('edge:mouseenter', ({ cell }) => {
+  //   cell.addTools([
+  //     {
+  //       name: 'source-arrowhead',
+  //       args: {
+  //         attrs: {},
+  //       },
+  //     },
+  //     'target-arrowhead',
+  //   ]);
+  // });
+  // graph.on('edge:mouseleave', ({ cell }) => {
+  //   cell.removeTools(['source-arrowhead', 'target-arrowhead']);
+  // });
 };
 
 //初始化页面

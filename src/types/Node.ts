@@ -25,4 +25,6 @@ export interface GraphLine {
   targetMarker: string;
   markerHeight: number;
   markerWidth: number;
+  fontSize: number;
+  fontColor: string;
 }

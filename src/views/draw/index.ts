@@ -157,7 +157,6 @@ const createNodeProperty = (config: {
         name: 'node-editor',
         args: {
           attrs: {
-            backgroundColor: '#ffffff',
             text: {
               fontSize: 15,
             },

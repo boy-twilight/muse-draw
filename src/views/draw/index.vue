@@ -38,7 +38,7 @@
               title="绘图信息">
               <DrawForm
                 v-model:model="curDraw"
-                @change="getFormValue"
+                @change="getDrawForm"
                 ref="drawForm" />
             </a-tab-pane>
             <a-tab-pane
@@ -62,7 +62,7 @@ import { Graph, Shape, Node, Cell } from '@antv/x6';
 import { Stencil } from '@antv/x6-plugin-stencil';
 import {
   showPorts,
-  createAllNodes,
+  createBasicNodes,
   registerKeyEvents,
   registerNode,
   registerPlugin,
@@ -109,7 +109,7 @@ const curNode = ref<GraphNode>({
   borderColor: '',
   borderSize: 0,
   textAnchor: ['middle'],
-  textVerticalAlign: ['middle'],
+  textVerticalAnchor: ['middle'],
 });
 //当前操作的连线
 const curLine = ref<GraphLine>({
@@ -123,7 +123,7 @@ const curTab = ref<'draw' | 'node'>('draw');
 const drawForm = ref<InstanceType<typeof DrawForm>>();
 
 //获取节点信息
-const getNodeInfo = (cell: Cell<Node.Properties>) => {
+const getNodePropety = (cell: Cell<Node.Properties>) => {
   //切换表单
   curId.value = cell.id;
   curType.value = 'node';
@@ -133,7 +133,7 @@ const getNodeInfo = (cell: Cell<Node.Properties>) => {
   const { width, height } = cell.getProp('size')!;
   const {
     body: { fill, stroke, strokeWidth },
-    text: { fill: fontColor, fontSize, textAnchor, textVerticalAlign },
+    text: { fill: fontColor, fontSize, textAnchor, textVerticalAnchor },
   } = attrs;
   curNode.value = {
     width,
@@ -144,8 +144,88 @@ const getNodeInfo = (cell: Cell<Node.Properties>) => {
     borderSize: Number(strokeWidth),
     background: String(fill),
     textAnchor: [String(textAnchor)],
-    textVerticalAlign: [String(textVerticalAlign)],
+    textVerticalAnchor: [String(textVerticalAnchor)],
   };
+};
+
+//当设置节点属性时
+const onNodeFormChange = (val: GraphNode) => {
+  const cell = graph.value!.getCellById(curId.value);
+  const {
+    background,
+    borderColor,
+    borderSize,
+    fontColor,
+    fontSize,
+    textAnchor,
+    textVerticalAnchor,
+    height,
+    width,
+  } = val;
+  cell.setAttrs({
+    body: { fill: background, stroke: borderColor, strokeWidth: borderSize },
+    text: {
+      fill: fontColor,
+      fontSize,
+      textAnchor: textAnchor[0],
+      textVerticalAnchor: textVerticalAnchor[0],
+    },
+  });
+  cell.setProp('size', {
+    width,
+    height,
+  });
+};
+
+//获取表单值
+const getDrawForm = (key: string, value: string) => {
+  curDraw.value[key as keyof DrawHistory] = value;
+};
+
+//导出图
+const exportGraph = (value: any) => {
+  if (value == 'png') {
+    graph.value!.exportPNG();
+  } else if (value == 'jpeg') {
+    graph.value!.exportJPEG();
+  } else {
+    graph.value!.exportSVG();
+  }
+};
+
+//保存作图
+const save = async () => {
+  const res = await drawForm.value?.validate();
+  if (res) {
+    curTab.value = 'draw';
+    return Message.error('请填写完整绘图名称和绘图备注后，在进行保存！');
+  }
+  curDraw.value.data = JSON.stringify(graph.value!.toJSON().cells);
+  curDraw.value.lastUpdate = format(new Date());
+  const index = userData.findIndex((item) => item.id == id);
+  if (index != -1) {
+    userData[index] = curDraw.value;
+    Message.success('修改保存成功！');
+  } else {
+    curDraw.value.id = v4();
+    userData.push(curDraw.value);
+    Message.success('新增保存成功！');
+  }
+};
+
+//获取页面初始值
+const getPageVal = () => {
+  if (id.length < 16) return;
+  curDraw.value = userData.find((item) => item.id == id) as DrawHistory;
+  const nodes = JSON.parse(curDraw.value.data) as any[];
+  nodes.forEach((item) => {
+    const { shape } = item;
+    if (shape == 'edge') {
+      graph.value?.addEdge(item);
+    } else {
+      graph.value?.addNode(item);
+    }
+  });
 };
 
 //初始化画布
@@ -208,6 +288,18 @@ const initGraph = (container: HTMLDivElement) => {
   });
 };
 
+//初始化页面
+const initPage = async () => {
+  registerNode();
+  graph.value = initGraph(container.value as HTMLDivElement);
+  registerPlugin(graph.value as Graph);
+  initStencil(graph.value as Graph);
+  registerKeyEvents(graph.value as Graph);
+  registerGraphEvents(graph.value as Graph);
+  await nextTick();
+  getPageVal();
+};
+
 //初始化侧边栏
 const initStencil = (graph: Graph) => {
   const stencilIns = new Stencil({
@@ -228,10 +320,11 @@ const initStencil = (graph: Graph) => {
       rowHeight: 45,
     },
   });
-  stencilIns.load(createAllNodes(graph), 'node');
+  stencilIns.load(createBasicNodes(graph), 'node');
   stencil.value?.appendChild(stencilIns.container);
 };
 
+//注册画布事件
 const registerGraphEvents = (graph: Graph) => {
   graph.on('node:mouseenter', () => {
     const ports = container.value!.querySelectorAll(
@@ -248,7 +341,7 @@ const registerGraphEvents = (graph: Graph) => {
   //点击节点时获取节点信息
   graph.on('node:click', ({ cell }) => {
     if (curId.value == cell.id) return;
-    getNodeInfo(cell);
+    getNodePropety(cell);
   });
   //新增节点时获取节点信息，顺便改变节点大小
   graph.on('node:added', ({ cell }) => {
@@ -259,7 +352,7 @@ const registerGraphEvents = (graph: Graph) => {
       height,
       width,
     });
-    getNodeInfo(cell);
+    getNodePropety(cell);
   });
   //节点大小改变时，更新值
   graph.on('node:change:size', ({ cell }) => {
@@ -284,98 +377,6 @@ const registerGraphEvents = (graph: Graph) => {
     };
     console.log(attrs);
   });
-};
-
-//获取表单值
-const getFormValue = (key: string, value: string) => {
-  curDraw.value[key as keyof DrawHistory] = value;
-};
-
-//导出图
-const exportGraph = (value: any) => {
-  if (value == 'png') {
-    graph.value!.exportPNG();
-  } else if (value == 'jpeg') {
-    graph.value!.exportJPEG();
-  } else {
-    graph.value!.exportSVG();
-  }
-};
-
-const onNodeFormChange = (val: GraphNode) => {
-  curNode.value = val;
-  const cell = graph.value!.getCellById(curId.value);
-  const {
-    background,
-    borderColor,
-    borderSize,
-    fontColor,
-    fontSize,
-    textAnchor,
-    textVerticalAlign,
-    height,
-    width,
-  } = curNode.value;
-  cell.setAttrs({
-    body: { fill: background, stroke: borderColor, strokeWidth: borderSize },
-    text: {
-      fill: fontColor,
-      fontSize,
-      textAnchor: textAnchor[0],
-      textVerticalAlign: textVerticalAlign[0],
-    },
-  });
-  cell.setProp('size', {
-    width,
-    height,
-  });
-};
-
-//获取页面初始值
-const getPageVal = () => {
-  if (id.length < 16) return;
-  curDraw.value = userData.find((item) => item.id == id) as DrawHistory;
-  const nodes = JSON.parse(curDraw.value.data) as any[];
-  nodes.forEach((item) => {
-    const { shape } = item;
-    if (shape == 'edge') {
-      graph.value?.addEdge(item);
-    } else {
-      graph.value?.addNode(item);
-    }
-  });
-};
-
-//保存作图
-const save = async () => {
-  const res = await drawForm.value?.validate();
-  if (res) {
-    curTab.value = 'draw';
-    return Message.error('请填写完整绘图名称和绘图备注后，在进行保存！');
-  }
-  curDraw.value.data = JSON.stringify(graph.value!.toJSON().cells);
-  curDraw.value.lastUpdate = format(new Date());
-  const index = userData.findIndex((item) => item.id == id);
-  if (index != -1) {
-    userData[index] = curDraw.value;
-    Message.success('修改保存成功！');
-  } else {
-    curDraw.value.id = v4();
-    userData.push(curDraw.value);
-    Message.success('新增保存成功！');
-  }
-};
-
-//初始化页面
-const initPage = async () => {
-  registerNode();
-  graph.value = initGraph(container.value as HTMLDivElement);
-  registerPlugin(graph.value as Graph);
-  initStencil(graph.value as Graph);
-  registerKeyEvents(graph.value as Graph);
-  registerGraphEvents(graph.value as Graph);
-  await nextTick();
-  getPageVal();
 };
 
 //离开路由的时候重新设置

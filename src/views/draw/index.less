@@ -18,7 +18,6 @@
       .container {
         width: calc(100% - 480px);
         height: 96.5vh;
-        display: flex;
       }
       .operation {
         border-left: 1px solid #dfe3e8;
@@ -52,6 +51,11 @@
 }
 
 .draw {
+  .x6-graph-scroller {
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
   .x6-widget-stencil {
     background-color: #fff;
   }

@@ -11,6 +11,7 @@ export const format = (time: Date, format: string = 'YYYY/MM/DD hh:mm:ss') => {
   return dayjs(time).format(format);
 };
 
+//警告Modal
 export const warning = (config: ModalConfig) => {
   const { title, content, onOk, onCancel } = config;
   Modal.warning({
@@ -22,9 +23,4 @@ export const warning = (config: ModalConfig) => {
     onOk,
     onCancel,
   });
-};
-
-//格式化
-export const clone = (data: any): any => {
-  return JSON.parse(JSON.stringify(data));
 };

@@ -10,7 +10,7 @@
       field="height"
       validate-trigger="blur">
       <a-input-number
-        v-model="node.height"
+        v-model.lazy="node.height"
         placeholder="请输入节点高度"
         :min="10" />
     </a-form-item>
@@ -19,7 +19,7 @@
       field="width"
       validate-trigger="blur">
       <a-input-number
-        v-model="node.width"
+        v-model.lazy="node.width"
         placeholder="请输入节点宽度"
         :min="10" />
     </a-form-item>
@@ -28,7 +28,7 @@
       field="fontSize"
       validate-trigger="blur">
       <a-input-number
-        v-model="node.fontSize"
+        v-model.lazy="node.fontSize"
         placeholder="请输入节点字体大小"
         :min="10" />
     </a-form-item>
@@ -37,9 +37,33 @@
       field="borderSize"
       validate-trigger="blur">
       <a-input-number
-        v-model="node.borderSize"
+        v-model.lazy="node.borderSize"
         placeholder="请输入节点字体大小"
         :min="1" />
+    </a-form-item>
+    <a-form-item
+      label="文字水平对齐方式"
+      field="textAnchor"
+      validate-trigger="blur">
+      <a-checkbox-group
+        v-model="node.textAnchor"
+        @change="changeAnchor">
+        <a-checkbox value="end">居左</a-checkbox>
+        <a-checkbox value="middle">居中</a-checkbox>
+        <a-checkbox value="start">居右</a-checkbox>
+      </a-checkbox-group>
+    </a-form-item>
+    <a-form-item
+      label="文字垂直对齐方式"
+      field="textAnchor"
+      validate-trigger="blur">
+      <a-checkbox-group
+        v-model="node.textVerticalAnchor"
+        @change="changeVerticalAnchor">
+        <a-checkbox value="bottom">居上</a-checkbox>
+        <a-checkbox value="middle">居中</a-checkbox>
+        <a-checkbox value="top">居下</a-checkbox>
+      </a-checkbox-group>
     </a-form-item>
     <a-form-item
       label="节点背景色"
@@ -50,28 +74,6 @@
         format="hex6"
         shape="circle"
         useType="both" />
-    </a-form-item>
-    <a-form-item
-      label="文字水平对齐方式"
-      field="textAnchor"
-      validate-trigger="blur">
-      <a-checkbox-group :default-value="node.textAnchor">
-        <a-checkbox value="start">居左</a-checkbox>
-        <a-checkbox value="middle">居中</a-checkbox>
-        <a-checkbox value="end">居右</a-checkbox>
-      </a-checkbox-group>
-    </a-form-item>
-    <a-form-item
-      label="文字垂直对齐方式"
-      field="textAnchor"
-      validate-trigger="blur">
-      <a-checkbox-group
-        :default-value="node.textVerticalAlign"
-        @change="changeSelect">
-        <a-checkbox value="start">居上</a-checkbox>
-        <a-checkbox value="middle">居中</a-checkbox>
-        <a-checkbox value="end">居下</a-checkbox>
-      </a-checkbox-group>
     </a-form-item>
     <a-form-item
       label="字体颜色"
@@ -122,7 +124,7 @@ const node = ref<GraphNode>({
   borderColor: '',
   borderSize: 0,
   textAnchor: ['middle'],
-  textVerticalAlign: ['middle'],
+  textVerticalAnchor: ['middle'],
 });
 //验证规则
 const rules: Record<string, FieldRule> = {
@@ -177,14 +179,22 @@ const rules: Record<string, FieldRule> = {
   },
 };
 
-const changeSelect = (val: any) => {
-  console.log(val);
+//改变水平对齐方式
+const changeAnchor = (val: any) => {
+  node.value.textAnchor = [val.at(-1)];
 };
 
+//改变垂直对齐方式
+const changeVerticalAnchor = (val: any) => {
+  node.value.textVerticalAnchor = [val.at(-1)];
+};
+
+//检测节点的改变重新赋值
 watch(property, (val) => {
   node.value = { ...val };
 });
 
+//回传表单属性
 watch(
   node,
   (val) => {
@@ -195,5 +205,3 @@ watch(
   }
 );
 </script>
-
-<style lang="less" scoped></style>

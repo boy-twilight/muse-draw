@@ -1,5 +1,5 @@
 // 控制连接桩显示/隐藏
-import { Graph } from '@antv/x6';
+import { Graph, Path } from '@antv/x6';
 import { Transform } from '@antv/x6-plugin-transform';
 import { Selection } from '@antv/x6-plugin-selection';
 import { Snapline } from '@antv/x6-plugin-snapline';
@@ -171,20 +171,6 @@ const createNodeProperty = (config: {
         bottom: createPortProperty('bottom'),
         left: createPortProperty('left'),
       },
-      items: [
-        {
-          group: 'top',
-        },
-        {
-          group: 'right',
-        },
-        {
-          group: 'bottom',
-        },
-        {
-          group: 'left',
-        },
-      ],
     },
   };
 };
@@ -229,12 +215,24 @@ export const registerNode = () => {
   );
 };
 
+//处理节点数据
+const handlePortData = (ports: string[] | undefined): { group: string }[] => {
+  return (ports ? ports : ['top', 'bottom', 'left', 'right']).map((item) => {
+    return { group: item };
+  });
+};
+
 //创建常用节点
-export const createPolygon = (
+const createPolygon = (
   graph: Graph,
-  config: { refPoints: string; height?: number; width?: number }
+  config: {
+    refPoints: string;
+    height?: number;
+    width?: number;
+    port?: string[];
+  }
 ) => {
-  let { refPoints, width, height } = config;
+  let { refPoints, width, height, port } = config;
   width = width ? width : 33;
   height = height ? height : 18;
   return graph.createNode({
@@ -246,14 +244,17 @@ export const createPolygon = (
         refPoints,
       },
     },
+    ports: {
+      items: handlePortData(port),
+    },
   });
 };
 
-export const createRect = (
+const createRect = (
   graph: Graph,
-  config: { rx: number; ry: number }
+  config: { rx: number; ry: number; port?: string[] }
 ) => {
-  const { rx, ry } = config;
+  const { rx, ry, port } = config;
   return graph.createNode({
     shape: 'custom-rect',
     attrs: {
@@ -262,18 +263,27 @@ export const createRect = (
         ry,
       },
     },
+    ports: {
+      items: handlePortData(port),
+    },
   });
 };
 
-export const createCircle = (graph: Graph) => {
+const createCircle = (graph: Graph, port?: string[]) => {
   return graph.createNode({
     shape: 'custom-circle',
+    ports: {
+      items: handlePortData(port),
+    },
   });
 };
 
-export const createEllipse = (graph: Graph) => {
+const createEllipse = (graph: Graph, port?: string[]) => {
   return graph.createNode({
     shape: 'custom-ellipse',
+    ports: {
+      items: handlePortData(port),
+    },
   });
 };
 
@@ -291,14 +301,18 @@ export const createBasicNodes = (graph: Graph) => {
     refPoints: '0,10 10,0 20,10 10,20',
   });
   const r8 = createPolygon(graph, {
-    height: 20,
-    width: 20,
-    refPoints: '100,10 40,198 190,78 10,78 160,198',
+    height: 25,
+    width: 25,
+    refPoints:
+      '0.5,0 0.61,0.35 1,0.35 0.68,0.57 0.79,0.91 0.5,0.75 0.21,0.91 0.32,0.57 0,0.35 0.39,0.35',
   });
   const r9 = createPolygon(graph, {
-    refPoints: '0,0 1,0 0,1',
+    refPoints: '0,0 0,1 1,1',
+    port: ['left', 'bottom'],
   });
   const r10 = createPolygon(graph, {
+    height: 20,
+    width: 20,
     refPoints: '0.5,0 1,1 0,1',
   });
   const r11 = createPolygon(graph, {
@@ -315,5 +329,6 @@ export const createBasicNodes = (graph: Graph) => {
     refPoints:
       '0.5,0 0.85,0.15 1,0.5 0.85,0.85 0.5,1 0.15,0.85 0,0.5 0.15,0.15',
   });
+
   return [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13];
 };

@@ -66,10 +66,10 @@ const handleClick = (key: string) => {
       .title {
         display: flex;
         align-items: center;
-        height: 48px;
+        height: 55px;
 
         img {
-          width: 30px;
+          width: 40px;
           margin: 0 5px 0 10px;
         }
         span {

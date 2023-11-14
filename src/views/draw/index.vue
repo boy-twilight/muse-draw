@@ -11,7 +11,7 @@
         <div class="header">
           <a-button
             type="primary"
-            @click="save">
+            @click="saveGraph">
             <template #icon>
               <IconSave />
             </template>
@@ -201,7 +201,7 @@ const exportGraph = (value: any) => {
 };
 
 //保存作图
-const save = async () => {
+const saveGraph = async () => {
   const res = await drawForm.value?.validate();
   if (res) {
     curTab.value = 'draw';
@@ -242,11 +242,12 @@ const initGraph = (container: HTMLDivElement) => {
   return new Graph({
     container: container,
     grid: true,
+    autoResize: container,
     mousewheel: {
       enabled: true,
       zoomAtMousePosition: true,
       modifiers: 'ctrl',
-      minScale: 0.5,
+      minScale: 0.2,
       maxScale: 3,
     },
     connecting: {
@@ -295,18 +296,6 @@ const initGraph = (container: HTMLDivElement) => {
       },
     },
   });
-};
-
-//初始化页面
-const initPage = async () => {
-  registerNode();
-  graph.value = initGraph(container.value as HTMLDivElement);
-  registerPlugin(graph.value as Graph);
-  initStencil(graph.value as Graph);
-  registerKeyEvents(graph.value as Graph);
-  registerGraphEvents(graph.value as Graph);
-  await nextTick();
-  getPageVal();
 };
 
 //初始化侧边栏
@@ -372,6 +361,11 @@ const registerGraphEvents = (graph: Graph) => {
     curNode.value.height = height;
     curNode.value.width = width;
   });
+  //节点删除时，删除属性
+  graph.on('node:removed', ({ cell }) => {
+    if (cell.id != curId.value) return;
+    curId.value = '';
+  });
   //点击边时获取边的信息
   graph.on('edge:click', ({ cell }) => {
     curId.value = cell.id;
@@ -388,6 +382,23 @@ const registerGraphEvents = (graph: Graph) => {
     };
     console.log(attrs);
   });
+  //边删除时，判断删除属性
+  graph.on('edge:removed', ({ cell }) => {
+    if (cell.id != curId.value) return;
+    curId.value = '';
+  });
+};
+
+//初始化页面
+const initPage = async () => {
+  registerNode();
+  graph.value = initGraph(container.value as HTMLDivElement);
+  registerPlugin(graph.value as Graph);
+  initStencil(graph.value as Graph);
+  registerKeyEvents(graph.value as Graph);
+  registerGraphEvents(graph.value as Graph);
+  await nextTick();
+  getPageVal();
 };
 
 onMounted(() => {

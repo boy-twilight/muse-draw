@@ -163,7 +163,7 @@ const rules: Record<string, FieldRule> = {
     message: '字体颜色不应该为空',
   },
   borderColor: {
-    type: 'number',
+    type: 'string',
     required: true,
     message: '边框色彩不应该为空',
   },

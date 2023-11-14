@@ -51,6 +51,10 @@
                   :property="curNode"
                   @change="onNodePropertyChange"
                   v-show="curType == 'node'" />
+                <GraphLineForm
+                  :property="curLine"
+                  @change="onLinePropertyChange"
+                  v-show="curType == 'line'" />
               </a-scrollbar>
               <div v-show="!curId">
                 <a-empty description="暂无节点信息" />
@@ -82,6 +86,7 @@ import { DrawHistory, GraphNode, GraphLine } from '@/types/node';
 import { ls, format } from '@/utils';
 import DrawForm from './package/DrawForm.vue';
 import GraphNodeForm from './package/GraphNodeForm.vue';
+import GraphLineForm from './package/GraphLineForm.vue';
 
 //拿到用户数据
 const userData = (ls.get('user_data') as DrawHistory[]) || [];
@@ -122,7 +127,10 @@ const curNode = ref<GraphNode>({
 const curLine = ref<GraphLine>({
   strokeColor: '',
   strokeWidth: 0,
-  lineType: '',
+  markerHeight: 0,
+  markerWidth: 0,
+  sourceMarker: '',
+  targetMarker: '',
 });
 //当前操作的属性tab
 const curTab = ref<'draw' | 'node'>('draw');
@@ -155,6 +163,27 @@ const getNodeProperty = (cell: Cell<Node.Properties>) => {
   };
 };
 
+//获取线条信息
+const getLineProperty = (cell: Cell<Node.Properties>) => {
+  const attrs = cell.getAttrs();
+  console.log(attrs);
+  const {
+    line: { stroke, strokeWidth, sourceMarker, targetMarker },
+  } = attrs;
+  const source = Object(sourceMarker);
+  const target = Object(targetMarker);
+  const { name: sourceName } = source;
+  const { name: targetName, height, width } = target;
+  curLine.value = {
+    strokeWidth: Number(strokeWidth),
+    strokeColor: String(stroke),
+    sourceMarker: sourceName ? sourceName : 'none',
+    targetMarker: targetName ? targetName : 'none',
+    markerHeight: height ? height : 0,
+    markerWidth: width ? width : 0,
+  };
+};
+
 //当设置节点属性时
 const onNodePropertyChange = (val: GraphNode) => {
   const cell = graph.value!.getCellById(curId.value);
@@ -181,6 +210,47 @@ const onNodePropertyChange = (val: GraphNode) => {
   cell.setProp('size', {
     width,
     height,
+  });
+};
+
+//设置线条属性的时候
+const onLinePropertyChange = (val: GraphLine) => {
+  const cell = graph.value!.getCellById(curId.value);
+  const {
+    markerWidth,
+    markerHeight,
+    strokeWidth,
+    strokeColor,
+    targetMarker,
+    sourceMarker,
+  } = val;
+  const targetMarkerData =
+    targetMarker == 'none'
+      ? null
+      : {
+          name: targetMarker,
+          height: markerHeight,
+          width: markerWidth,
+          stroke: strokeColor,
+          fill: strokeColor,
+        };
+  const sourceMarkerData =
+    sourceMarker == 'none'
+      ? null
+      : {
+          name: sourceMarker,
+          height: markerHeight,
+          width: markerWidth,
+          stroke: strokeColor,
+          fill: strokeColor,
+        };
+  cell.setAttrs({
+    line: {
+      stroke: strokeColor,
+      strokeWidth,
+      sourceMarker: sourceMarkerData,
+      targetMarker: targetMarkerData,
+    },
   });
 };
 
@@ -368,19 +438,11 @@ const registerGraphEvents = (graph: Graph) => {
   });
   //点击边时获取边的信息
   graph.on('edge:click', ({ cell }) => {
+    if (curId.value == cell.id) return;
     curId.value = cell.id;
     curTab.value = 'node';
     curType.value = 'line';
-    const attrs = cell.getAttrs();
-    const {
-      line: { stroke, strokeWidth },
-    } = attrs;
-    curLine.value = {
-      strokeWidth: Number(strokeWidth),
-      strokeColor: String(stroke),
-      lineType: '',
-    };
-    console.log(attrs);
+    getLineProperty(cell);
   });
   //边删除时，判断删除属性
   graph.on('edge:removed', ({ cell }) => {

@@ -21,5 +21,8 @@ export interface GraphNode {
 export interface GraphLine {
   strokeColor: string;
   strokeWidth: number;
-  lineType: string;
+  sourceMarker: string;
+  targetMarker: string;
+  markerHeight: number;
+  markerWidth: number;
 }

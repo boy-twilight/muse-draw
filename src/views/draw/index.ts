@@ -1,5 +1,5 @@
 // 控制连接桩显示/隐藏
-import { Graph, Path } from '@antv/x6';
+import { Graph } from '@antv/x6';
 import { Transform } from '@antv/x6-plugin-transform';
 import { Selection } from '@antv/x6-plugin-selection';
 import { Snapline } from '@antv/x6-plugin-snapline';
@@ -9,6 +9,7 @@ import { History } from '@antv/x6-plugin-history';
 import { Export } from '@antv/x6-plugin-export';
 import { Scroller } from '@antv/x6-plugin-scroller';
 
+//控制连接桩的显示
 export const showPorts = (ports: NodeListOf<SVGElement>, show: boolean) => {
   for (let i = 0, len = ports.length; i < len; i += 1) {
     ports[i].style.visibility = show ? 'visible' : 'hidden';
@@ -311,8 +312,8 @@ export const createBasicNodes = (graph: Graph) => {
     port: ['left', 'bottom'],
   });
   const r10 = createPolygon(graph, {
-    height: 20,
-    width: 20,
+    height: 22,
+    width: 25,
     refPoints: '0.5,0 1,1 0,1',
   });
   const r11 = createPolygon(graph, {

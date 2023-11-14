@@ -190,9 +190,15 @@ const changeVerticalAnchor = (val: any) => {
 };
 
 //检测节点的改变重新赋值
-watch(property, (val) => {
-  node.value = { ...val };
-});
+watch(
+  property,
+  (val) => {
+    node.value = { ...val };
+  },
+  {
+    deep: true,
+  }
+);
 
 //回传表单属性
 watch(

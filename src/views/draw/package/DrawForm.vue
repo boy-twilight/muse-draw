@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, toRefs, ref } from 'vue';
+import { reactive, toRefs, ref, watch } from 'vue';
 import { DrawHistory } from '@/types/node';
 import { Form, ValidatedError, FieldRule } from '@arco-design/web-vue';
 
@@ -57,8 +57,24 @@ const rules: Record<string, FieldRule> = {
 };
 
 const { model } = toRefs(props);
-const form = reactive<DrawHistory>({ ...model.value });
+const form = ref<DrawHistory>({
+  name: '',
+  desc: '',
+  data: '',
+  lastUpdate: '',
+  id: '',
+});
 const formIns = ref<InstanceType<typeof Form>>();
+
+watch(
+  model,
+  (val) => {
+    form.value = { ...val };
+  },
+  {
+    deep: true,
+  }
+);
 
 defineExpose({
   validate(): Promise<Record<string, ValidatedError> | undefined> {

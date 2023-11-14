@@ -44,10 +44,17 @@
             <a-tab-pane
               key="node"
               title="节点属性">
-              <GraphNodeForm
-                :property="curNode"
-                @change="onNodeFormChange"
-                v-show="curType == 'node'" />
+              <a-scrollbar
+                v-show="curId"
+                style="height: 78vh; overflow: auto">
+                <GraphNodeForm
+                  :property="curNode"
+                  @change="onNodePropertyChange"
+                  v-show="curType == 'node'" />
+              </a-scrollbar>
+              <div v-show="!curId">
+                <a-empty description="暂无节点信息" />
+              </div>
             </a-tab-pane>
           </a-tabs>
         </a-card>
@@ -70,7 +77,7 @@ import {
 import { v4 } from 'uuid';
 import { IconSave, IconExport } from '@arco-design/web-vue/es/icon';
 import { Message } from '@arco-design/web-vue';
-import { useRoute, onBeforeRouteLeave } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { DrawHistory, GraphNode, GraphLine } from '@/types/node';
 import { ls, format } from '@/utils';
 import DrawForm from './package/DrawForm.vue';
@@ -123,7 +130,7 @@ const curTab = ref<'draw' | 'node'>('draw');
 const drawForm = ref<InstanceType<typeof DrawForm>>();
 
 //获取节点信息
-const getNodePropety = (cell: Cell<Node.Properties>) => {
+const getNodeProperty = (cell: Cell<Node.Properties>) => {
   //切换表单
   curId.value = cell.id;
   curType.value = 'node';
@@ -149,7 +156,7 @@ const getNodePropety = (cell: Cell<Node.Properties>) => {
 };
 
 //当设置节点属性时
-const onNodeFormChange = (val: GraphNode) => {
+const onNodePropertyChange = (val: GraphNode) => {
   const cell = graph.value!.getCellById(curId.value);
   const {
     background,
@@ -211,12 +218,14 @@ const save = async () => {
     userData.push(curDraw.value);
     Message.success('新增保存成功！');
   }
+  ls.set('user_data', userData);
 };
 
 //获取页面初始值
 const getPageVal = () => {
-  if (id.length < 16) return;
-  curDraw.value = userData.find((item) => item.id == id) as DrawHistory;
+  const target = userData.find((item) => item.id == id);
+  if (!target) return;
+  curDraw.value = target;
   const nodes = JSON.parse(curDraw.value.data) as any[];
   nodes.forEach((item) => {
     const { shape } = item;
@@ -310,7 +319,7 @@ const initStencil = (graph: Graph) => {
     collapsable: true,
     groups: [
       {
-        title: '图形',
+        title: '基础图形',
         name: 'node',
       },
     ],
@@ -319,6 +328,17 @@ const initStencil = (graph: Graph) => {
       columnWidth: 53,
       rowHeight: 45,
     },
+    //获取拖拽的node
+    getDropNode(node) {
+      const size = node.size();
+      const clone = node.clone().size({
+        height: size.height * 3,
+        width: size.width * 3,
+      });
+      //获取node信息
+      getNodeProperty(clone);
+      return clone;
+    },
   });
   stencilIns.load(createBasicNodes(graph), 'node');
   stencil.value?.appendChild(stencilIns.container);
@@ -326,12 +346,14 @@ const initStencil = (graph: Graph) => {
 
 //注册画布事件
 const registerGraphEvents = (graph: Graph) => {
+  //鼠标进入时显示连接桩
   graph.on('node:mouseenter', () => {
     const ports = container.value!.querySelectorAll(
       '.x6-port-body'
     ) as NodeListOf<SVGElement>;
     showPorts(ports, true);
   });
+  //鼠标离开时隐藏连接桩
   graph.on('node:mouseleave', () => {
     const ports = container.value!.querySelectorAll(
       '.x6-port-body'
@@ -341,18 +363,7 @@ const registerGraphEvents = (graph: Graph) => {
   //点击节点时获取节点信息
   graph.on('node:click', ({ cell }) => {
     if (curId.value == cell.id) return;
-    getNodePropety(cell);
-  });
-  //新增节点时获取节点信息，顺便改变节点大小
-  graph.on('node:added', ({ cell }) => {
-    let { height, width } = cell.getProp('size');
-    height *= 3;
-    width *= 3;
-    cell.setProp('size', {
-      height,
-      width,
-    });
-    getNodePropety(cell);
+    getNodeProperty(cell);
   });
   //节点大小改变时，更新值
   graph.on('node:change:size', ({ cell }) => {
@@ -378,11 +389,6 @@ const registerGraphEvents = (graph: Graph) => {
     console.log(attrs);
   });
 };
-
-//离开路由的时候重新设置
-onBeforeRouteLeave(() => {
-  ls.set('user_data', userData);
-});
 
 onMounted(() => {
   initPage();

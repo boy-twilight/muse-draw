@@ -324,7 +324,7 @@ const initGraph = (container: HTMLDivElement) => {
     mousewheel: {
       enabled: true,
       zoomAtMousePosition: true,
-      modifiers: 'ctrl',
+      modifiers: ['ctrl', 'meta'],
       minScale: 0.2,
       maxScale: 3,
     },

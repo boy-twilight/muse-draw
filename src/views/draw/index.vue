@@ -198,6 +198,7 @@ const onNodePropertyChange = (val: GraphNode) => {
     width,
     height,
   });
+  curNode.value = val;
 };
 
 //设置线条属性的时候
@@ -239,6 +240,7 @@ const onLinePropertyChange = (val: GraphLine) => {
       targetMarker: targetMarkerData,
     },
   });
+  curLine.value = val;
 };
 
 //获取表单值
@@ -471,15 +473,12 @@ const registerGraphEvents = (graph: Graph) => {
     if (cell.id != curId.value) return;
     curId.value = '';
   });
-  //边改变时同步值
-  graph.on('edge:change:*', ({ cell }) => {
-    if (curId.value != cell.id) return;
-    getLineProperty(cell);
-  });
   //节点大小改变时，同步值
-  graph.on('node:change:*', ({ cell }) => {
+  graph.on('node:change:size', ({ cell }) => {
     if (curId.value != cell.id) return;
-    getNodeProperty(cell);
+    const { height, width } = cell.getProp('size');
+    curNode.value.height = height;
+    curNode.value.width = width;
   });
   // graph.on('edge:mouseenter', ({ cell }) => {
   //   cell.addTools([

@@ -34,6 +34,7 @@ declare module 'vue' {
     AScroller: typeof import('@arco-design/web-vue')['Scroller']
     AScrollerbar: typeof import('@arco-design/web-vue')['Scrollerbar']
     ASelect: typeof import('@arco-design/web-vue')['Select']
+    ASlider: typeof import('@arco-design/web-vue')['Slider']
     ATable: typeof import('@arco-design/web-vue')['Table']
     ATableColumn: typeof import('@arco-design/web-vue')['TableColumn']
     ATabPane: typeof import('@arco-design/web-vue')['TabPane']

@@ -9,37 +9,49 @@
       label="节点高度"
       field="height"
       validate-trigger="blur">
-      <a-input-number
-        v-model.lazy="node.height"
-        placeholder="请输入节点高度"
-        :min="10" />
+      <div class="slider-container">
+        <a-slider
+          v-model.lazy="node.height"
+          :min="10"
+          :max="1000"
+          show-input />
+      </div>
     </a-form-item>
     <a-form-item
       label="节点宽度"
       field="width"
       validate-trigger="blur">
-      <a-input-number
-        v-model.lazy="node.width"
-        placeholder="请输入节点宽度"
-        :min="10" />
+      <div class="slider-container">
+        <a-slider
+          v-model.lazy="node.width"
+          :min="10"
+          :max="1000"
+          show-input />
+      </div>
     </a-form-item>
     <a-form-item
       label="字体大小"
       field="fontSize"
       validate-trigger="blur">
-      <a-input-number
-        v-model.lazy="node.fontSize"
-        placeholder="请输入节点字体大小"
-        :min="10" />
+      <div class="slider-container">
+        <a-slider
+          v-model.lazy="node.fontSize"
+          :min="10"
+          :max="100"
+          show-input />
+      </div>
     </a-form-item>
     <a-form-item
       label="边框大小"
       field="borderSize"
       validate-trigger="blur">
-      <a-input-number
-        v-model.lazy="node.borderSize"
-        placeholder="请输入节点字体大小"
-        :min="1" />
+      <div class="slider-container">
+        <a-slider
+          v-model.lazy="node.borderSize"
+          :min="1"
+          :max="100"
+          show-input />
+      </div>
     </a-form-item>
     <a-form-item
       label="文字水平对齐方式"
@@ -123,25 +135,21 @@ const rules: Record<string, FieldRule> = {
   width: {
     type: 'number',
     required: true,
-    min: 10,
     message: '节点宽度应该大于10',
   },
   height: {
     type: 'number',
     required: true,
-    min: 10,
     message: '节点高度应该大于10',
   },
   borderSize: {
     type: 'number',
     required: true,
-    min: 1,
     message: '边框大小应该大于1',
   },
   fontSize: {
     type: 'number',
     required: true,
-    min: 10,
     message: '字体大小应该大于10',
   },
   background: {
@@ -195,3 +203,26 @@ watch(
   }
 );
 </script>
+
+<style lang="less" scoped>
+.arco-form {
+  &:deep(.arco-form-item-content) {
+    .slider-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      padding-left: 5px;
+      .arco-slider {
+        display: flex;
+        .arco-input-wrapper {
+          width: 50px;
+          .arco-input {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+}
+</style>

@@ -9,37 +9,49 @@
       label="线条宽度"
       field="strokeWidth"
       validate-trigger="blur">
-      <a-input-number
-        v-model.lazy="line.strokeWidth"
-        placeholder="请输入线条宽度"
-        :min="1" />
+      <div class="slider-container">
+        <a-slider
+          v-model.lazy="line.strokeWidth"
+          :min="1"
+          :max="100"
+          show-input />
+      </div>
     </a-form-item>
     <a-form-item
       label="边上字体大小"
       field="fontSize"
       validate-trigger="blur">
-      <a-input-number
-        v-model.lazy="line.fontSize"
-        placeholder="请输入边上字体大小"
-        :min="1" />
+      <div class="slider-container">
+        <a-slider
+          v-model.lazy="line.fontSize"
+          :min="10"
+          :max="100"
+          show-input />
+      </div>
     </a-form-item>
     <a-form-item
       label="箭头宽度"
       field="markerWidth"
       validate-trigger="blur">
-      <a-input-number
-        v-model.lazy="line.markerWidth"
-        placeholder="请输入箭头宽度"
-        :min="1" />
+      <div class="slider-container">
+        <a-slider
+          v-model.lazy="line.markerWidth"
+          :min="5"
+          :max="100"
+          show-input />
+      </div>
     </a-form-item>
     <a-form-item
       label="箭头高度"
       field="markerHeight"
       validate-trigger="blur">
-      <a-input-number
-        v-model.lazy="line.markerHeight"
-        placeholder="请输入箭头高度"
-        :min="1" />
+      <div class="slider-container">
+        <a-slider
+          v-model.lazy="line.markerHeight"
+          :min="5"
+          :max="100"
+          show-input />
+      </div>
     </a-form-item>
     <a-form-item
       label="起点箭头类型"
@@ -107,25 +119,21 @@ const rules: Record<string, FieldRule> = {
   strokeWidth: {
     type: 'number',
     required: true,
-    min: 1,
     message: '线条宽度应该大于1',
   },
   fontSize: {
     type: 'number',
     required: true,
-    min: 1,
     message: '边上字体大小应该大于1',
   },
   markerHeight: {
     type: 'number',
     required: true,
-    min: 1,
     message: '箭头高度应该大于1',
   },
   markerWidth: {
     type: 'number',
     required: true,
-    min: 1,
     message: '箭头宽度应该大于1',
   },
   sourceMarker: {
@@ -213,3 +221,26 @@ watch(
   }
 );
 </script>
+
+<style lang="less" scoped>
+.arco-form {
+  &:deep(.arco-form-item-content) {
+    .slider-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      padding-left: 10px;
+      .arco-slider {
+        display: flex;
+        .arco-input-wrapper {
+          width: 50px;
+          .arco-input {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+}
+</style>

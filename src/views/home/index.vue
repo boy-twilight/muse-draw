@@ -75,7 +75,7 @@
       </a-table>
       <div class="footer">
         <a-pagination
-          :total="history.length"
+          :total="userData.length"
           v-model:current="curPage"
           v-model:page-size="pageSize"
           :page-size-options="[10, 20, 30, 40, 50]"
@@ -89,16 +89,16 @@
 
 <script lang="ts" setup>
 import { ref, computed, onMounted } from 'vue';
-import { DrawHistory } from '@/types/node';
 import { IconEdit, IconDelete } from '@arco-design/web-vue/es/icon';
 import { Message } from '@arco-design/web-vue';
 import { ls, warning } from '@/utils';
 import { useRouter } from 'vue-router';
 import { PAGE_DRAW } from '@/constants/page';
+import useDataStore from '@/store/data';
+import { storeToRefs } from 'pinia';
 
 const router = useRouter();
-//用户的操作历史
-const history = ref<DrawHistory[]>(ls.get('user_data') || []);
+const { userData } = storeToRefs(useDataStore());
 //当前的选择的列的key
 const curKeys = ref<string[]>([]);
 //搜索关键字
@@ -109,15 +109,15 @@ const curPage = ref<number>(1);
 const pageSize = ref<number>(10);
 //当前显示的表格
 const curShow = computed(() =>
-  history.value
+  userData.value
     .filter((item) => item.name.includes(keyWords.value))
     .slice((curPage.value - 1) * pageSize.value, curPage.value * pageSize.value)
 );
 
 //删除历史记录
 const deleteHistory = (id: string) => {
-  const index = history.value.findIndex((item) => item.id == id);
-  history.value.splice(index, 1);
+  const index = userData.value.findIndex((item) => item.id == id);
+  userData.value.splice(index, 1);
 };
 
 //批量删除历史记录
@@ -128,7 +128,7 @@ const deleteSelect = () => {
     title: '批量删除选择',
     content: '确认批量删除选中的绘图记录吗，此操作不可撤销',
     onOk: () => {
-      history.value = history.value.filter(
+      userData.value = userData.value.filter(
         (item) => !curKeys.value.includes(item.id)
       );
       curKeys.value = [];
@@ -139,7 +139,7 @@ const deleteSelect = () => {
 //刷新或者退出浏览器时，保存记录
 onMounted(() => {
   window.addEventListener('beforeunload', () => {
-    ls.set('user_data', history.value);
+    ls.set('user_data', userData.value);
   });
 });
 </script>

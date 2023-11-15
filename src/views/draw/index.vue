@@ -87,9 +87,11 @@ import { useRoute } from 'vue-router';
 import { DrawHistory, GraphNode, GraphLine } from '@/types/node';
 import { ls, format } from '@/utils';
 import { DrawForm, GraphLineForm, GraphNodeForm } from './package';
+import useDataStore from '@/store/data';
+import { storeToRefs } from 'pinia';
 
 //拿到用户数据
-const userData = (ls.get('user_data') as DrawHistory[]) || [];
+const { userData } = storeToRefs(useDataStore());
 //拿到路由参数
 const route = useRoute();
 const id = route.query.id + '';
@@ -266,21 +268,20 @@ const saveGraph = async () => {
   }
   curDraw.value.data = JSON.stringify(graph.value!.toJSON().cells);
   curDraw.value.lastUpdate = format(new Date());
-  const index = userData.findIndex((item) => item.id == id);
+  const index = userData.value.findIndex((item) => item.id == id);
   if (index != -1) {
-    userData[index] = curDraw.value;
+    userData.value[index] = curDraw.value;
     Message.success('修改保存成功！');
   } else {
     curDraw.value.id = v4();
-    userData.push(curDraw.value);
+    userData.value.push(curDraw.value);
     Message.success('新增保存成功！');
   }
-  ls.set('user_data', userData);
 };
 
 //获取页面初始值
 const getPageVal = () => {
-  const target = userData.find((item) => item.id == id);
+  const target = userData.value.find((item) => item.id == id);
   if (!target) return;
   curDraw.value = target;
   const nodes = JSON.parse(curDraw.value.data) as any[];
@@ -296,11 +297,29 @@ const getPageVal = () => {
 
 //初始化画布
 const initGraph = (container: HTMLDivElement) => {
+  const { width, height } = getComputedStyle(container);
   return new Graph({
     container: container,
-    grid: true,
+    grid: {
+      type: 'doubleMesh',
+      size: 12,
+      visible: true,
+      args: [
+        {
+          color: '#eee', // 主网格线颜色
+          thickness: 1, // 主网格线宽度
+        },
+        {
+          color: '#ddd', // 次网格线颜色
+          thickness: 1, // 次网格线宽度
+          factor: 4, // 主次网格线间隔
+        },
+      ],
+    },
     //是否允许子节点
     embedding: true,
+    width: Number.parseFloat(width),
+    height: Number.parseFloat(height),
     // 缩放
     mousewheel: {
       enabled: true,
@@ -314,6 +333,10 @@ const initGraph = (container: HTMLDivElement) => {
       edgeLabelMovable: true,
       edgeMovable: true,
       arrowheadMovable: true,
+    },
+    panning: {
+      enabled: true,
+      modifiers: ['ctrl', 'meta'],
     },
     // 连接
     connecting: {

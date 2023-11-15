@@ -10,16 +10,10 @@ export const routes: RouteRecordRaw[] = [
       {
         path: 'home',
         component: () => import('@/views/home/index.vue'),
-        meta: {
-          title: '记录',
-        },
       },
       {
         path: 'draw',
         component: () => import('@/views/draw/index.vue'),
-        meta: {
-          title: '绘画',
-        },
       },
     ],
   },

@@ -1,10 +1,9 @@
 import { createApp } from 'vue';
 import '@/assets/style/reset.less';
 import '@/assets/style/transition.less';
-import '@/assets/style/global.less';
 import App from './App.vue';
 import router from './router';
-import pinia from './pinia';
+import pinia from './store';
 import ArcoVue from '@arco-design/web-vue';
 import '@arco-design/web-vue/dist/arco.css';
 

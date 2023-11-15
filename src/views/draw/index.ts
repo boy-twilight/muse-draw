@@ -7,7 +7,6 @@ import { Keyboard } from '@antv/x6-plugin-keyboard';
 import { Clipboard } from '@antv/x6-plugin-clipboard';
 import { History } from '@antv/x6-plugin-history';
 import { Export } from '@antv/x6-plugin-export';
-import { Scroller } from '@antv/x6-plugin-scroller';
 import { GraphLine, GraphNode } from '@/types/node';
 
 //控制连接桩的显示
@@ -36,12 +35,7 @@ export const registerPlugin = (graph: Graph) => {
     .use(new Keyboard())
     .use(new Clipboard())
     .use(new History())
-    .use(new Export())
-    .use(
-      new Scroller({
-        enabled: true,
-      })
-    );
+    .use(new Export());
 };
 
 //注册常用快捷键

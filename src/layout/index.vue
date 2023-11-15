@@ -42,7 +42,7 @@ import { IconPen, IconHistory } from '@arco-design/web-vue/es/icon';
 import { PAGE_DRAW, PAGE_HOME } from '@/constants/page';
 import { useRouter } from 'vue-router';
 import { ss } from '@/utils';
-import logo from '@/assets/icon/logo.svg';
+import logo from '@/assets/image/logo.svg';
 
 const router = useRouter();
 const curKey = ref<string[]>(ss.get('curKey') || [PAGE_HOME]);

@@ -86,9 +86,7 @@ import { Message } from '@arco-design/web-vue';
 import { useRoute } from 'vue-router';
 import { DrawHistory, GraphNode, GraphLine } from '@/types/node';
 import { ls, format } from '@/utils';
-import DrawForm from './package/DrawForm.vue';
-import GraphNodeForm from './package/GraphNodeForm.vue';
-import GraphLineForm from './package/GraphLineForm.vue';
+import { DrawForm, GraphLineForm, GraphNodeForm } from './package';
 
 //拿到用户数据
 const userData = (ls.get('user_data') as DrawHistory[]) || [];

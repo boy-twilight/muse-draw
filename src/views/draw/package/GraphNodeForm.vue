@@ -45,25 +45,25 @@
       label="文字水平对齐方式"
       field="textAnchor"
       validate-trigger="blur">
-      <a-checkbox-group
+      <a-radio-group
         v-model="node.textAnchor"
-        @change="changeAnchor">
-        <a-checkbox value="end">居左</a-checkbox>
-        <a-checkbox value="middle">居中</a-checkbox>
-        <a-checkbox value="start">居右</a-checkbox>
-      </a-checkbox-group>
+        type="button">
+        <a-radio value="end">向左对齐</a-radio>
+        <a-radio value="middle">两端对齐</a-radio>
+        <a-radio value="start">向右对齐</a-radio>
+      </a-radio-group>
     </a-form-item>
     <a-form-item
       label="文字垂直对齐方式"
-      field="textAnchor"
+      field="textVerticalAnchor"
       validate-trigger="blur">
-      <a-checkbox-group
+      <a-radio-group
         v-model="node.textVerticalAnchor"
-        @change="changeVerticalAnchor">
-        <a-checkbox value="bottom">居上</a-checkbox>
-        <a-checkbox value="middle">居中</a-checkbox>
-        <a-checkbox value="top">居下</a-checkbox>
-      </a-checkbox-group>
+        type="button">
+        <a-radio value="bottom">顶部对齐</a-radio>
+        <a-radio value="middle">居中对齐</a-radio>
+        <a-radio value="top">底部对齐</a-radio>
+      </a-radio-group>
     </a-form-item>
     <a-form-item
       label="节点背景色"
@@ -102,9 +102,10 @@
 import { GraphNode } from '@/types/node';
 import { FieldRule } from '@arco-design/web-vue';
 import { ref, toRefs, watch } from 'vue';
+import { cloneDeep, isEqual } from 'lodash-es';
 import { ColorPicker } from 'vue3-colorpicker';
 import 'vue3-colorpicker/style.css';
-import { isEqual } from 'lodash-es';
+import { initNodeProperty } from '..';
 
 const props = defineProps<{
   property: GraphNode;
@@ -116,17 +117,7 @@ const emits = defineEmits<{
 
 const { property } = toRefs(props);
 //当前节点
-const node = ref<GraphNode>({
-  width: 0,
-  height: 0,
-  fontColor: '',
-  fontSize: 0,
-  background: '',
-  borderColor: '',
-  borderSize: 0,
-  textAnchor: ['middle'],
-  textVerticalAnchor: ['middle'],
-});
+const node = ref<GraphNode>(initNodeProperty());
 //验证规则
 const rules: Record<string, FieldRule> = {
   width: {
@@ -173,28 +164,18 @@ const rules: Record<string, FieldRule> = {
     required: true,
     message: '必须选中一种文字水平对齐方式',
   },
-  textVerticalAlign: {
+  textVerticalAnchor: {
     type: 'array',
     required: true,
     message: '必须选中一种文字锤子对齐方式',
   },
 };
 
-//改变水平对齐方式
-const changeAnchor = (val: any) => {
-  node.value.textAnchor = [val.at(-1)];
-};
-
-//改变垂直对齐方式
-const changeVerticalAnchor = (val: any) => {
-  node.value.textVerticalAnchor = [val.at(-1)];
-};
-
 //检测节点的改变重新赋值
 watch(
   property,
   (val) => {
-    node.value = { ...val };
+    node.value = cloneDeep(val);
   },
   {
     deep: true,
@@ -205,7 +186,7 @@ watch(
 watch(
   node,
   (val) => {
-    if (!isEqual(val, property.value)) {
+    if (!isEqual(property.value, val)) {
       emits('change', val);
     }
   },

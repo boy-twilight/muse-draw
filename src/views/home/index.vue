@@ -91,7 +91,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { DrawHistory } from '@/types/node';
 import { IconEdit, IconDelete } from '@arco-design/web-vue/es/icon';
-import { Message, Modal } from '@arco-design/web-vue';
+import { Message } from '@arco-design/web-vue';
 import { ls, warning } from '@/utils';
 import { useRouter } from 'vue-router';
 import { PAGE_DRAW } from '@/constants/page';
@@ -133,7 +133,6 @@ const deleteSelect = () => {
       );
       curKeys.value = [];
     },
-    onCancel: () => {},
   });
 };
 

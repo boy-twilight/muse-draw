@@ -8,6 +8,7 @@ import { Clipboard } from '@antv/x6-plugin-clipboard';
 import { History } from '@antv/x6-plugin-history';
 import { Export } from '@antv/x6-plugin-export';
 import { Scroller } from '@antv/x6-plugin-scroller';
+import { GraphLine, GraphNode } from '@/types/node';
 
 //控制连接桩的显示
 export const showPorts = (ports: NodeListOf<SVGElement>, show: boolean) => {
@@ -331,4 +332,33 @@ export const createBasicNodes = (graph: Graph) => {
   });
 
   return [r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13];
+};
+
+//初始化节点默认值
+export const initNodeProperty = (): GraphNode => {
+  return {
+    width: 0,
+    height: 0,
+    fontColor: '',
+    fontSize: 0,
+    background: '',
+    borderColor: '',
+    borderSize: 0,
+    textAnchor: '',
+    textVerticalAnchor: '',
+  };
+};
+
+//初始化线条默认值
+export const initLineProperty = (): GraphLine => {
+  return {
+    strokeColor: '',
+    strokeWidth: 0,
+    markerHeight: 0,
+    markerWidth: 0,
+    sourceMarker: '',
+    targetMarker: '',
+    fontSize: 0,
+    fontColor: '',
+  };
 };

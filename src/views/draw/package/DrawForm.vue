@@ -43,6 +43,14 @@ const emits = defineEmits<{
   (e: 'change', key: string, value: any): void;
 }>();
 
+const { model } = toRefs(props);
+const form = ref<DrawHistory>({
+  name: '',
+  desc: '',
+  data: '',
+  lastUpdate: '',
+  id: '',
+});
 const rules: Record<string, FieldRule> = {
   name: {
     message: '绘图名称必须填写',
@@ -55,15 +63,6 @@ const rules: Record<string, FieldRule> = {
     type: 'string',
   },
 };
-
-const { model } = toRefs(props);
-const form = ref<DrawHistory>({
-  name: '',
-  desc: '',
-  data: '',
-  lastUpdate: '',
-  id: '',
-});
 const formIns = ref<InstanceType<typeof Form>>();
 
 watch(

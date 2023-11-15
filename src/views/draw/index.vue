@@ -77,6 +77,8 @@ import {
   registerKeyEvents,
   registerNode,
   registerPlugin,
+  initNodeProperty,
+  initLineProperty,
 } from './index';
 import { v4 } from 'uuid';
 import { IconSave, IconExport } from '@arco-design/web-vue/es/icon';
@@ -112,28 +114,9 @@ const curId = ref<string>('');
 //当前节点的类型
 const curType = ref<'node' | 'line'>('node');
 //当前操作的节点
-const curNode = ref<GraphNode>({
-  width: 0,
-  height: 0,
-  fontColor: '',
-  fontSize: 0,
-  background: '',
-  borderColor: '',
-  borderSize: 0,
-  textAnchor: ['middle'],
-  textVerticalAnchor: ['middle'],
-});
+const curNode = ref<GraphNode>(initNodeProperty());
 //当前操作的连线
-const curLine = ref<GraphLine>({
-  strokeColor: '',
-  strokeWidth: 0,
-  markerHeight: 0,
-  markerWidth: 0,
-  sourceMarker: '',
-  targetMarker: '',
-  fontSize: 0,
-  fontColor: '',
-});
+const curLine = ref<GraphLine>(initLineProperty());
 //当前操作的属性tab
 const curTab = ref<'draw' | 'node'>('draw');
 //全局属性表单的实例
@@ -159,8 +142,8 @@ const getNodeProperty = (cell: Cell<Node.Properties>) => {
     borderColor: String(stroke),
     borderSize: Number(strokeWidth),
     background: String(fill),
-    textAnchor: [String(textAnchor)],
-    textVerticalAnchor: [String(textVerticalAnchor)],
+    textAnchor: String(textAnchor),
+    textVerticalAnchor: String(textVerticalAnchor),
   };
 };
 
@@ -207,8 +190,8 @@ const onNodePropertyChange = (val: GraphNode) => {
     text: {
       fill: fontColor,
       fontSize,
-      textAnchor: textAnchor[0],
-      textVerticalAnchor: textVerticalAnchor[0],
+      textAnchor: textAnchor,
+      textVerticalAnchor: textVerticalAnchor,
     },
   });
   cell.setProp('size', {
@@ -230,7 +213,7 @@ const onLinePropertyChange = (val: GraphLine) => {
   } = val;
   const targetMarkerData =
     targetMarker == 'none'
-      ? null
+      ? {}
       : {
           name: targetMarker,
           height: markerHeight,
@@ -240,7 +223,7 @@ const onLinePropertyChange = (val: GraphLine) => {
         };
   const sourceMarkerData =
     sourceMarker == 'none'
-      ? null
+      ? {}
       : {
           name: sourceMarker,
           height: markerHeight,
@@ -256,7 +239,6 @@ const onLinePropertyChange = (val: GraphLine) => {
       targetMarker: targetMarkerData,
     },
   });
-  cell.setProp('sourceMarker');
 };
 
 //获取表单值
@@ -317,7 +299,9 @@ const initGraph = (container: HTMLDivElement) => {
   return new Graph({
     container: container,
     grid: true,
-    autoResize: container,
+    //是否允许子节点
+    embedding: true,
+    // 缩放
     mousewheel: {
       enabled: true,
       zoomAtMousePosition: true,
@@ -325,25 +309,32 @@ const initGraph = (container: HTMLDivElement) => {
       minScale: 0.2,
       maxScale: 3,
     },
+    // 交互
     interacting: {
       edgeLabelMovable: true,
       edgeMovable: true,
       arrowheadMovable: true,
     },
+    // 连接
     connecting: {
+      //这三个属性决定线条类型和连接位置
       router: 'manhattan',
+      anchor: 'center',
+      connectionPoint: 'anchor',
+      //连接器
       connector: {
         name: 'rounded',
         args: {
           radius: 8,
         },
       },
-      anchor: 'center',
-      connectionPoint: 'anchor',
-      allowBlank: false,
+      //自动吸附，指定吸附距离
       snap: {
         radius: 20,
       },
+      //允许空白连接
+      allowBlank: true,
+      //连接时，创建边
       createEdge() {
         const edge = new Shape.Edge({
           attrs: {
@@ -390,6 +381,7 @@ const initGraph = (container: HTMLDivElement) => {
         return !!targetMagnet;
       },
     },
+    // 高亮
     highlighting: {
       magnetAdsorbed: {
         name: 'stroke',
@@ -397,6 +389,7 @@ const initGraph = (container: HTMLDivElement) => {
           attrs: {
             fill: '#5F95FF',
             stroke: '#5F95FF',
+            strokeWidth: 5,
           },
         },
       },
@@ -462,13 +455,6 @@ const registerGraphEvents = (graph: Graph) => {
     if (curId.value == cell.id) return;
     getNodeProperty(cell);
   });
-  //节点大小改变时，更新值
-  graph.on('node:change:size', ({ cell }) => {
-    if (curId.value != cell.id) return;
-    const { height, width } = cell.getProp('size');
-    curNode.value.height = height;
-    curNode.value.width = width;
-  });
   //点击边时获取边的信息
   graph.on('edge:click', ({ cell }) => {
     curTab.value = 'node';
@@ -484,6 +470,16 @@ const registerGraphEvents = (graph: Graph) => {
   graph.on('edge:removed', ({ cell }) => {
     if (cell.id != curId.value) return;
     curId.value = '';
+  });
+  //边改变时同步值
+  graph.on('edge:change:*', ({ cell }) => {
+    if (curId.value != cell.id) return;
+    getLineProperty(cell);
+  });
+  //节点大小改变时，同步值
+  graph.on('node:change:*', ({ cell }) => {
+    if (curId.value != cell.id) return;
+    getNodeProperty(cell);
   });
   // graph.on('edge:mouseenter', ({ cell }) => {
   //   cell.addTools([

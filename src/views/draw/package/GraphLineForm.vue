@@ -88,7 +88,8 @@ import { FieldRule, SelectOption } from '@arco-design/web-vue';
 import { ref, toRefs, watch } from 'vue';
 import { ColorPicker } from 'vue3-colorpicker';
 import 'vue3-colorpicker/style.css';
-import { isEqual } from 'lodash-es';
+import { isEqual, cloneDeep } from 'lodash-es';
+import { initLineProperty } from '..';
 
 const props = defineProps<{
   property: GraphLine;
@@ -100,16 +101,7 @@ const emits = defineEmits<{
 
 const { property } = toRefs(props);
 //当前线条
-const line = ref<GraphLine>({
-  strokeColor: '',
-  strokeWidth: 0,
-  markerHeight: 0,
-  markerWidth: 0,
-  sourceMarker: '',
-  targetMarker: '',
-  fontSize: 0,
-  fontColor: '',
-});
+const line = ref<GraphLine>(initLineProperty());
 //验证规则
 const rules: Record<string, FieldRule> = {
   strokeWidth: {
@@ -201,7 +193,7 @@ const options: SelectOption[] = [
 watch(
   property,
   (val) => {
-    line.value = { ...val };
+    line.value = cloneDeep(val);
   },
   {
     deep: true,

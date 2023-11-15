@@ -14,8 +14,8 @@ export interface GraphNode {
   borderColor: string;
   borderSize: number;
   background: string;
-  textAnchor: string[];
-  textVerticalAnchor: string[];
+  textAnchor: string;
+  textVerticalAnchor: string;
 }
 
 export interface GraphLine {

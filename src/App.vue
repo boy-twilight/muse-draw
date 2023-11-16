@@ -1,5 +1,5 @@
 <template>
-  <div class="app">
+  <div id="container">
     <RouterView />
   </div>
 </template>
@@ -7,12 +7,12 @@
 <script lang="ts" setup></script>
 
 <style lang="less">
-body {
-  overflow: hidden;
-}
-.app {
+#app {
   height: 100vh;
   width: 100vw;
-  overflow: hidden;
+  #container {
+    height: 100%;
+    width: 100%;
+  }
 }
 </style>

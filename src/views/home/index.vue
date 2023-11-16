@@ -146,28 +146,33 @@ onMounted(() => {
 
 <style lang="less" scoped>
 .home {
-  .header {
-    margin: 10px 0;
-    display: flex;
-    .left {
-      flex-grow: 1;
-      flex-basis: 1;
-      flex-shrink: 0;
+  height: 100%;
+  width: 100%;
+  .arco-card {
+    height: 100%;
+    .header {
+      margin: 10px 0;
+      display: flex;
+      .left {
+        flex-grow: 1;
+        flex-basis: 1;
+        flex-shrink: 0;
+      }
+      .right {
+        width: 350px;
+      }
     }
-    .right {
-      width: 350px;
+    .arco-table {
+      .arco-link {
+        margin-right: 10px;
+      }
     }
-  }
-  .arco-table {
-    .arco-link {
-      margin-right: 10px;
+    .footer {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+      padding-right: 40px;
     }
-  }
-  .footer {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 20px;
-    padding-right: 40px;
   }
 }
 </style>

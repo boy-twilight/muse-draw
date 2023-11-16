@@ -4,65 +4,75 @@
       <div
         class="stencil"
         ref="stencil"></div>
-      <div
-        class="container"
-        ref="container"></div>
-      <div class="operation">
-        <div class="header">
-          <a-button
-            type="primary"
-            @click="saveGraph">
-            <template #icon>
-              <IconSave />
-            </template>
-            保存
-          </a-button>
-          <a-dropdown @select="exportGraph">
-            <a-button>
-              <template #icon>
-                <icon-export />
-              </template>
-              导出
-            </a-button>
-            <template #content>
-              <a-doption value="png">PNG格式</a-doption>
-              <a-doption value="jpeg">JPEG格式</a-doption>
-              <a-doption value="svg">SVG格式</a-doption>
-            </template>
-          </a-dropdown>
-        </div>
-        <a-card class="property">
-          <a-tabs v-model:active-key="curTab">
-            <a-tab-pane
-              key="draw"
-              title="绘图信息">
-              <DrawForm
-                v-model:model="curDraw"
-                @change="getDrawForm"
-                ref="drawForm" />
-            </a-tab-pane>
-            <a-tab-pane
-              key="node"
-              title="节点属性">
-              <a-scrollbar
-                v-show="curId"
-                style="height: 78vh; overflow: auto">
-                <GraphNodeForm
-                  :property="curNode"
-                  @change="onNodePropertyChange"
-                  v-show="curType == 'node'" />
-                <GraphLineForm
-                  :property="curLine"
-                  @change="onLinePropertyChange"
-                  v-show="curType == 'line'" />
-              </a-scrollbar>
-              <div v-show="!curId">
-                <a-empty description="暂无节点信息" />
-              </div>
-            </a-tab-pane>
-          </a-tabs>
-        </a-card>
-      </div>
+      <a-split
+        class="split"
+        v-model:size="size"
+        :max="0.73"
+        :min="0.6">
+        <template #first>
+          <div
+            class="container"
+            ref="container"></div>
+        </template>
+        <template #second>
+          <div class="operation">
+            <div class="header">
+              <a-button
+                type="primary"
+                @click="saveGraph">
+                <template #icon>
+                  <IconSave />
+                </template>
+                保存
+              </a-button>
+              <a-dropdown @select="exportGraph">
+                <a-button>
+                  <template #icon>
+                    <icon-export />
+                  </template>
+                  导出
+                </a-button>
+                <template #content>
+                  <a-doption value="png">PNG格式</a-doption>
+                  <a-doption value="jpeg">JPEG格式</a-doption>
+                  <a-doption value="svg">SVG格式</a-doption>
+                </template>
+              </a-dropdown>
+            </div>
+            <a-card class="property">
+              <a-tabs v-model:active-key="curTab">
+                <a-tab-pane
+                  key="draw"
+                  title="绘图信息">
+                  <DrawForm
+                    v-model:model="curDraw"
+                    @change="getDrawForm"
+                    ref="drawForm" />
+                </a-tab-pane>
+                <a-tab-pane
+                  key="node"
+                  title="节点属性">
+                  <a-scrollbar
+                    v-show="curId"
+                    style="height: 76.3vh; overflow: auto">
+                    <GraphNodeForm
+                      :property="curNode"
+                      @change="onNodePropertyChange"
+                      v-show="curType == 'node'" />
+                    <GraphLineForm
+                      :property="curLine"
+                      @change="onLinePropertyChange"
+                      v-show="curType == 'line'" />
+                  </a-scrollbar>
+                  <div v-show="!curId">
+                    <a-empty description="暂无节点信息" />
+                  </div>
+                </a-tab-pane>
+              </a-tabs>
+            </a-card>
+          </div>
+        </template>
+      </a-split>
     </a-card>
   </div>
 </template>
@@ -85,7 +95,7 @@ import { IconSave, IconExport } from '@arco-design/web-vue/es/icon';
 import { Message } from '@arco-design/web-vue';
 import { useRoute } from 'vue-router';
 import { DrawHistory, GraphNode, GraphLine } from '@/types/node';
-import { ls, format } from '@/utils';
+import { format } from '@/utils';
 import { DrawForm, GraphLineForm, GraphNodeForm } from './package';
 import useDataStore from '@/store/data';
 import { storeToRefs } from 'pinia';
@@ -121,6 +131,8 @@ const curLine = ref<GraphLine>(initLineProperty());
 const curTab = ref<'draw' | 'node'>('draw');
 //全局属性表单的实例
 const drawForm = ref<InstanceType<typeof DrawForm>>();
+//面板分隔
+const size = ref<number>(0.73);
 
 //获取节点信息
 const getNodeProperty = (cell: Cell<Node.Properties>) => {

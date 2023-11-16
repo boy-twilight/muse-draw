@@ -6,7 +6,10 @@
 
 <script lang="ts" setup></script>
 
-<style lang="less" scoped>
+<style lang="less">
+body {
+  overflow: hidden;
+}
 .app {
   height: 100vh;
   width: 100vw;

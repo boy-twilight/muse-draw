@@ -6,6 +6,7 @@ import { Snapline } from '@antv/x6-plugin-snapline';
 import { Keyboard } from '@antv/x6-plugin-keyboard';
 import { Clipboard } from '@antv/x6-plugin-clipboard';
 import { History } from '@antv/x6-plugin-history';
+import { Scroller } from '@antv/x6-plugin-scroller';
 import { Export } from '@antv/x6-plugin-export';
 import { GraphLine, GraphNode } from '@/types/node';
 
@@ -21,28 +22,44 @@ export const registerPlugin = (graph: Graph) => {
   graph
     .use(
       new Transform({
-        resizing: true,
-        rotating: true,
+        resizing: {
+          enabled: true,
+          preserveAspectRatio: true,
+        },
+        rotating: {
+          enabled: true,
+        },
       })
     )
     .use(
       new Selection({
         rubberband: true,
         showNodeSelectionBox: true,
+        showEdgeSelectionBox: true,
       })
     )
-    .use(new Snapline())
+    .use(
+      new Snapline({
+        className: 'snapline',
+      })
+    )
     .use(new Keyboard())
     .use(new Clipboard())
     .use(new History())
-    .use(new Export());
+    .use(new Export())
+    .use(
+      new Scroller({
+        modifiers: ['ctrl', 'meta'],
+        pannable: true,
+      })
+    );
+  graph.lockScroller();
 };
 
 //注册常用快捷键
 export const registerKeyEvents = (graph: Graph) => {
   //copy
   graph.bindKey(['meta+c', 'ctrl+c'], () => {
-    console.log(1);
     const cells = graph.getSelectedCells();
     if (cells.length) {
       graph.copy(cells);
@@ -97,7 +114,7 @@ export const registerKeyEvents = (graph: Graph) => {
 };
 
 //创建连接桩通用属性
-export const createPortProperty = (position: string) => {
+const createPortProperty = (position: string) => {
   return {
     position,
     attrs: {

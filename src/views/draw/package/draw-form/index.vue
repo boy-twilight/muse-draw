@@ -16,6 +16,16 @@
         @change="emits('change', 'name', form.name)" />
     </a-form-item>
     <a-form-item
+      label="导出类型"
+      field="exportType"
+      validate-trigger="blur">
+      <a-select
+        v-model="form.exportType"
+        :options="options"
+        @change="emits('change', 'exportType', form.exportType)"
+        placeholder="请选择导出图片的类型" />
+    </a-form-item>
+    <a-form-item
       label="备注"
       field="desc"
       validate-trigger="blur">
@@ -31,9 +41,14 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, toRefs, ref, watch } from 'vue';
+import { toRefs, ref, watch } from 'vue';
 import { UserData } from '@/types/node';
-import { Form, ValidatedError, FieldRule } from '@arco-design/web-vue';
+import {
+  Form,
+  ValidatedError,
+  FieldRule,
+  SelectOption,
+} from '@arco-design/web-vue';
 
 const props = defineProps<{
   model: UserData;
@@ -45,11 +60,13 @@ const emits = defineEmits<{
 
 const { model } = toRefs(props);
 const form = ref<UserData>({
+  id: '',
   name: '',
   desc: '',
   data: '',
+  exportType: '',
   updateTime: '',
-  id: '',
+  createTime: '',
 });
 const rules: Record<string, FieldRule> = {
   name: {
@@ -62,7 +79,17 @@ const rules: Record<string, FieldRule> = {
     required: true,
     type: 'string',
   },
+  exportType: {
+    message: '导出图片的类型必须选择',
+    required: true,
+    type: 'string',
+  },
 };
+const options: SelectOption[] = [
+  { label: 'png格式', value: 'png' },
+  { label: 'jpeg格式', value: 'jpeg' },
+  { label: 'svg格式', value: 'svg' },
+];
 const formIns = ref<InstanceType<typeof Form>>();
 
 watch(

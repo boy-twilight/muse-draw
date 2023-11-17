@@ -3,6 +3,7 @@ export interface UserData {
   name: string;
   desc: string;
   data: string;
+  exportType: string;
   createTime: string;
   updateTime: string;
 }
@@ -28,4 +29,8 @@ export interface GraphLine {
   markerWidth: number;
   fontSize: number;
   fontColor: string;
+}
+
+export interface GraphProperty {
+  background: string;
 }

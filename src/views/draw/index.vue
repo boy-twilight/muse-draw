@@ -16,38 +16,11 @@
         </template>
         <template #second>
           <div class="operation">
-            <div class="header">
-              <a-button
-                type="primary"
-                @click="saveGraph">
-                <template #icon>
-                  <IconSave />
-                </template>
-                保存
-              </a-button>
-              <a-dropdown @select="exportGraph">
-                <a-button>
-                  <template #icon>
-                    <icon-export />
-                  </template>
-                  导出
-                </a-button>
-                <template #content>
-                  <a-doption value="png">PNG格式</a-doption>
-                  <a-doption value="jpeg">JPEG格式</a-doption>
-                  <a-doption value="svg">SVG格式</a-doption>
-                </template>
-              </a-dropdown>
-            </div>
             <a-card class="property">
               <a-tabs v-model:active-key="curTab">
                 <a-tab-pane
-                  key="draw"
-                  title="绘图信息">
-                  <DrawForm
-                    v-model:model="curDraw"
-                    @change="getDrawForm"
-                    ref="drawForm" />
+                  key="global"
+                  title="画布属性">
                 </a-tab-pane>
                 <a-tab-pane
                   key="node"
@@ -66,6 +39,30 @@
                   </a-scrollbar>
                   <div v-show="!curId">
                     <a-empty description="暂无节点信息" />
+                  </div>
+                </a-tab-pane>
+                <a-tab-pane
+                  key="draw"
+                  title="绘图信息">
+                  <DrawForm
+                    v-model:model="curDraw"
+                    @change="getDrawForm"
+                    ref="drawForm" />
+                  <div class="footer">
+                    <a-button
+                      type="primary"
+                      @click="saveGraph">
+                      <template #icon>
+                        <IconSave />
+                      </template>
+                      保存作图
+                    </a-button>
+                    <a-button @click="exportGraph">
+                      <template #icon>
+                        <icon-export />
+                      </template>
+                      导出图片
+                    </a-button>
                   </div>
                 </a-tab-pane>
               </a-tabs>
@@ -117,6 +114,7 @@ const curDraw = ref<UserData>({
   name: '',
   desc: '',
   data: '',
+  exportType: '',
   createTime: '',
   updateTime: '',
 });
@@ -129,7 +127,7 @@ const curNode = ref<GraphNode>(initNodeProperty());
 //当前操作的连线
 const curLine = ref<GraphLine>(initLineProperty());
 //当前操作的属性tab
-const curTab = ref<'draw' | 'node'>('draw');
+const curTab = ref<'draw' | 'node' | 'global'>('global');
 //全局属性表单的实例
 const drawForm = ref<InstanceType<typeof DrawForm>>();
 //面板分隔
@@ -274,10 +272,12 @@ const getDrawForm = (key: string, value: string) => {
 };
 
 //导出图
-const exportGraph = (value: any) => {
-  if (value == 'png') {
+const exportGraph = () => {
+  const { exportType } = curDraw.value;
+  if (!exportType) return Message.error('请先保存过后再进行导出！');
+  if (exportType == 'png') {
     graph.value!.exportPNG();
-  } else if (value == 'jpeg') {
+  } else if (exportType == 'jpeg') {
     graph.value!.exportJPEG();
   } else {
     graph.value!.exportSVG();
@@ -359,10 +359,6 @@ const initGraph = (container: HTMLDivElement) => {
       edgeMovable: true,
       arrowheadMovable: true,
     },
-    panning: {
-      enabled: true,
-      modifiers: ['ctrl', 'meta'],
-    },
     // 连接
     connecting: {
       //这三个属性决定线条类型和连接位置
@@ -440,11 +436,11 @@ const initGraph = (container: HTMLDivElement) => {
 //初始化侧边栏
 const initStencil = (graph: Graph) => {
   const stencilIns = new Stencil({
-    title: '流程图',
+    title: '流程图基础图形',
     target: graph,
     stencilGraphWidth: 200,
     stencilGraphHeight: 250,
-    collapsable: true,
+    collapsable: false,
     groups: [
       {
         title: '基础图形',
@@ -518,20 +514,6 @@ const registerGraphEvents = (graph: Graph) => {
     curNode.value.height = height;
     curNode.value.width = width;
   });
-  // graph.on('edge:mouseenter', ({ cell }) => {
-  //   cell.addTools([
-  //     {
-  //       name: 'source-arrowhead',
-  //       args: {
-  //         attrs: {},
-  //       },
-  //     },
-  //     'target-arrowhead',
-  //   ]);
-  // });
-  // graph.on('edge:mouseleave', ({ cell }) => {
-  //   cell.removeTools(['source-arrowhead', 'target-arrowhead']);
-  // });
 };
 
 //初始化页面

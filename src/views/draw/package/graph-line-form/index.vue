@@ -17,7 +17,7 @@
           show-input />
       </div>
     </a-form-item>
-    <a-form-item
+    <!-- <a-form-item
       label="字体大小"
       field="fontSize"
       validate-trigger="blur">
@@ -28,7 +28,7 @@
           :max="100"
           show-input />
       </div>
-    </a-form-item>
+    </a-form-item> -->
     <a-form-item
       label="箭头宽度"
       field="markerWidth"
@@ -81,7 +81,7 @@
         shape="circle"
         useType="both" />
     </a-form-item>
-    <a-form-item
+    <!-- <a-form-item
       label="字体颜色"
       field="fontColor"
       validate-trigger="blur">
@@ -90,7 +90,7 @@
         format="hex6"
         shape="circle"
         useType="both" />
-    </a-form-item>
+    </a-form-item> -->
   </a-form>
 </template>
 

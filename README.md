@@ -2,7 +2,7 @@
 
 1. 基于蚂蚁的 antv x6 实现的一个简易流程图绘画平台，实现了基本功能
 2. 系统实现大概如下
-   !['系统实现'](https://chart-twilight.gitee.io/image/%E6%B5%81%E7%A8%8B%E5%88%B6%E4%BD%9C.png)
+   !['系统实现'](https://chart-twilight.gitee.io/image/%E6%B5%81%E7%A8%8B%E5%88%B6%E4%BD%9C%E6%9C%80%E6%96%B0.png)
 3. 快捷键
    | 快捷键 | 操作 |
    | ---- | ---- |

@@ -32,11 +32,11 @@
 
 <script lang="ts" setup>
 import { reactive, toRefs, ref, watch } from 'vue';
-import { DrawHistory } from '@/types/node';
+import { UserData } from '@/types/node';
 import { Form, ValidatedError, FieldRule } from '@arco-design/web-vue';
 
 const props = defineProps<{
-  model: DrawHistory;
+  model: UserData;
 }>();
 
 const emits = defineEmits<{
@@ -44,11 +44,11 @@ const emits = defineEmits<{
 }>();
 
 const { model } = toRefs(props);
-const form = ref<DrawHistory>({
+const form = ref<UserData>({
   name: '',
   desc: '',
   data: '',
-  lastUpdate: '',
+  updateTime: '',
   id: '',
 });
 const rules: Record<string, FieldRule> = {

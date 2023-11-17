@@ -3,9 +3,13 @@
     <a-layout-sider class="side">
       <a-menu
         :default-selected-keys="curKey"
+        v-model:collapsed="isCollapse"
         @menu-item-click="handleClick"
+        show-collapse-button
         class="menu">
-        <div class="title"><img :src="logo" /><span>muse draw</span></div>
+        <div class="title">
+          <img :src="logo" /><span>{{ isCollapse ? '' : 'muse draw' }}</span>
+        </div>
         <a-menu-item :key="PAGE_HOME">
           <template #icon>
             <IconHistory />
@@ -37,7 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { IconPen, IconHistory } from '@arco-design/web-vue/es/icon';
 import { PAGE_DRAW, PAGE_HOME } from '@/constants/page';
 import { useRouter } from 'vue-router';
@@ -45,7 +49,19 @@ import { ss } from '@/utils';
 import logo from '@/assets/image/logo.svg';
 
 const router = useRouter();
+//当前活跃的key
 const curKey = ref<string[]>(ss.get('curKey') || [PAGE_HOME]);
+//菜单是否收缩
+const isCollapse = ref<boolean>(true);
+//logo大小
+const logoSize = computed(() => `${isCollapse.value ? 25 : 40}px`);
+//菜单的宽度
+const menuSize = computed(() => `${isCollapse.value ? 48 : 200}px`);
+//内容的宽度
+const mainSize = computed(
+  () => `calc(100% - ${isCollapse.value ? 48 : 200}px)`
+);
+
 const handleClick = (key: string) => {
   if (curKey.value[0] == key) return;
   curKey.value = [key];
@@ -59,7 +75,7 @@ const handleClick = (key: string) => {
   height: 100%;
   width: 100%;
   .side {
-    width: 220px;
+    width: v-bind(menuSize) !important;
     .menu {
       height: 100%;
 
@@ -69,21 +85,25 @@ const handleClick = (key: string) => {
         height: 55px;
 
         img {
-          width: 40px;
+          width: v-bind(logoSize);
           margin: 0 5px 0 10px;
         }
         span {
           font-size: 14px;
           color: #000;
           font-weight: 550;
+          transition: 0.3s;
+          overflow: hidden;
         }
       }
     }
   }
   .main {
-    width: calc(100% - 200px);
+    width: v-bind(mainSize);
     height: 100%;
     .content {
+      height: 100%;
+      width: 100%;
       padding: 12px;
       background-color: #f5f5f5;
     }

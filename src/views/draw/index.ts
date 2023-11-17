@@ -102,7 +102,7 @@ export const createPortProperty = (position: string) => {
     position,
     attrs: {
       circle: {
-        r: 4,
+        r: 4.5,
         magnet: true,
         stroke: '#000',
         strokeWidth: 1,

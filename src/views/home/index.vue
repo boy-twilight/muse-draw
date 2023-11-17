@@ -40,9 +40,13 @@
             tooltip
             data-index="name" />
           <a-table-column
-            title="最后一次修改时间"
+            title="保存时间"
             :width="250"
-            data-index="lastUpdate" />
+            data-index="createTime" />
+          <a-table-column
+            title="修改时间"
+            :width="250"
+            data-index="updateTime" />
           <a-table-column title="操作">
             <template #cell="{ record }">
               <a-link

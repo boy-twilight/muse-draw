@@ -1,9 +1,10 @@
-export interface DrawHistory {
+export interface UserData {
   id: string;
   name: string;
   desc: string;
   data: string;
-  lastUpdate: string;
+  createTime: string;
+  updateTime: string;
 }
 
 export interface GraphNode {

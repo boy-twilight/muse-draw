@@ -94,7 +94,7 @@ import { v4 } from 'uuid';
 import { IconSave, IconExport } from '@arco-design/web-vue/es/icon';
 import { Message } from '@arco-design/web-vue';
 import { useRoute } from 'vue-router';
-import { DrawHistory, GraphNode, GraphLine } from '@/types/node';
+import { UserData, GraphNode, GraphLine } from '@/types/node';
 import { format } from '@/utils';
 import { DrawForm, GraphLineForm, GraphNodeForm } from './package';
 import useDataStore from '@/store/data';
@@ -112,12 +112,13 @@ const container = ref<HTMLDivElement>();
 //侧边栏辅助容器
 const stencil = ref<HTMLDivElement>();
 //当前画图
-const curDraw = ref<DrawHistory>({
+const curDraw = ref<UserData>({
+  id: '',
   name: '',
   desc: '',
   data: '',
-  lastUpdate: '',
-  id: '',
+  createTime: '',
+  updateTime: '',
 });
 //当前操作的id
 const curId = ref<string>('');
@@ -226,25 +227,37 @@ const onLinePropertyChange = (val: GraphLine) => {
   } = val;
   const targetMarkerData =
     targetMarker == 'none'
-      ? {}
+      ? {
+          name: 'block',
+          height: 0,
+          width: 0,
+          stroke: 'transparent',
+          fill: 'transparent',
+        }
       : {
           name: targetMarker,
           height: markerHeight,
           width: markerWidth,
-          stroke: strokeColor,
+          stroke: strokeWidth,
           fill: strokeColor,
         };
   const sourceMarkerData =
     sourceMarker == 'none'
-      ? {}
+      ? {
+          name: 'block',
+          height: 0,
+          width: 0,
+          stroke: 'transparent',
+          fill: 'transparent',
+        }
       : {
           name: sourceMarker,
           height: markerHeight,
           width: markerWidth,
-          stroke: strokeColor,
+          stroke: strokeWidth,
           fill: strokeColor,
         };
-  cell.replaceAttrs({
+  cell.setAttrs({
     line: {
       stroke: strokeColor,
       strokeWidth,
@@ -257,7 +270,7 @@ const onLinePropertyChange = (val: GraphLine) => {
 
 //获取表单值
 const getDrawForm = (key: string, value: string) => {
-  curDraw.value[key as keyof DrawHistory] = value;
+  curDraw.value[key as keyof UserData] = value;
 };
 
 //导出图
@@ -279,13 +292,16 @@ const saveGraph = async () => {
     return Message.error('请填写完整绘图名称和绘图备注后，在进行保存！');
   }
   curDraw.value.data = JSON.stringify(graph.value!.toJSON().cells);
-  curDraw.value.lastUpdate = format(new Date());
   const index = userData.value.findIndex((item) => item.id == id);
   if (index != -1) {
+    curDraw.value.updateTime = format(new Date());
     userData.value[index] = curDraw.value;
     Message.success('修改保存成功！');
   } else {
     curDraw.value.id = v4();
+    const curTime = new Date();
+    curDraw.value.createTime = format(curTime);
+    curDraw.value.updateTime = format(curTime);
     userData.value.push(curDraw.value);
     Message.success('新增保存成功！');
   }
@@ -309,7 +325,6 @@ const getPageVal = () => {
 
 //初始化画布
 const initGraph = (container: HTMLDivElement) => {
-  const { width, height } = getComputedStyle(container);
   return new Graph({
     container: container,
     grid: {
@@ -330,8 +345,6 @@ const initGraph = (container: HTMLDivElement) => {
     },
     //是否允许子节点
     embedding: true,
-    width: Number.parseFloat(width),
-    height: Number.parseFloat(height),
     // 缩放
     mousewheel: {
       enabled: true,
@@ -395,14 +408,6 @@ const initGraph = (container: HTMLDivElement) => {
               },
             },
           ],
-          defaultLabel: {
-            attrs: {
-              text: {
-                fill: '#FF0000', // 设置所有标签的颜色为红色
-                fontSize: 18, // 设置所有标签的文字大小
-              },
-            },
-          },
           zIndex: 0,
         });
         //获取线条样式

@@ -5,25 +5,20 @@
     auto-label-width>
     <a-form-item
       label="背景色"
-      field="background"
-      validate-trigger="blur">
+      field="background">
       <ColorPicker
         v-model:pureColor="graph.background"
-        format="hex6"
-        shape="circle"
-        useType="both" />
+        format="hex6" />
     </a-form-item>
     <a-form-item
       label="画布缩放"
-      field="mousewheel"
-      validate-trigger="blur">
+      field="mousewheel">
       <Switch v-model="graph.mousewheel" />
     </a-form-item>
     <a-form-item
       v-show="graph.mousewheel"
       label="缩放倍率"
-      field="scale"
-      validate-trigger="blur">
+      field="scale">
       <div class="slider-container">
         <a-slider
           v-model="graph.scale"
@@ -36,19 +31,15 @@
     </a-form-item>
     <a-form-item
       label="画布平移"
-      field="panning"
-      validate-trigger="blur">
+      field="panning">
       <Switch v-model="graph.panning" />
     </a-form-item>
     <a-form-item
       label="节点嵌套"
-      field="embedding"
-      validate-trigger="blur">
+      field="embedding">
       <Switch v-model="graph.embedding" />
     </a-form-item>
-    <a-form-item
-      field="allowBlank"
-      validate-trigger="blur">
+    <a-form-item field="allowBlank">
       <template #label>
         <div class="label">
           <span>空白连接</span>
@@ -59,9 +50,7 @@
       </template>
       <Switch v-model="graph.allowBlank" />
     </a-form-item>
-    <a-form-item
-      field="allowBlank"
-      validate-trigger="blur">
+    <a-form-item field="allowBlank">
       <template #label>
         <div class="label">
           <span>空白连接</span>
@@ -72,9 +61,7 @@
       </template>
       <Switch v-model="graph.allowBlank" />
     </a-form-item>
-    <a-form-item
-      field="allowLoop"
-      validate-trigger="blur">
+    <a-form-item field="allowLoop">
       <template #label>
         <div class="label">
           <span>循环连接</span>
@@ -86,9 +73,7 @@
       </template>
       <Switch v-model="graph.allowLoop" />
     </a-form-item>
-    <a-form-item
-      field="allowMulti"
-      validate-trigger="blur">
+    <a-form-item field="allowMulti">
       <template #label>
         <div class="label">
           <span>多边连接</span>
@@ -101,9 +86,7 @@
       </template>
       <Switch v-model="graph.allowMulti" />
     </a-form-item>
-    <a-form-item
-      field="highlight"
-      validate-trigger="blur">
+    <a-form-item field="highlight">
       <template #label>
         <div class="label">
           <span>连接高光</span>
@@ -115,9 +98,7 @@
       </template>
       <Switch v-model="graph.highlight" />
     </a-form-item>
-    <a-form-item
-      field="nodeMovable"
-      validate-trigger="blur">
+    <a-form-item field="nodeMovable">
       <template #label>
         <div class="label">
           <span>节点拖拽</span>
@@ -128,9 +109,7 @@
       </template>
       <Switch v-model="graph.nodeMovable" />
     </a-form-item>
-    <a-form-item
-      field="edgeMovable"
-      validate-trigger="blur">
+    <a-form-item field="edgeMovable">
       <template #label>
         <div class="label">
           <span>边拖拽</span>
@@ -141,9 +120,7 @@
       </template>
       <Switch v-model="graph.edgeMovable" />
     </a-form-item>
-    <a-form-item
-      field="edgeMovable"
-      validate-trigger="blur">
+    <a-form-item field="edgeMovable">
       <template #label>
         <div class="label">
           <span>边标签拖拽</span>
@@ -154,9 +131,7 @@
       </template>
       <Switch v-model="graph.edgeLabelMovable" />
     </a-form-item>
-    <a-form-item
-      field="arrowheadMovable"
-      validate-trigger="blur">
+    <a-form-item field="arrowheadMovable">
       <template #label>
         <div class="label">
           <span>箭头拖拽</span>

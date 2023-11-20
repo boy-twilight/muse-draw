@@ -223,6 +223,19 @@
           show-input />
       </div>
     </a-form-item>
+    <a-form-item field="lineTools">
+      <template #label>
+        <div class="label">
+          <span>边上工具</span>
+          <a-tooltip content="开启边的一些小工具便于操作，默认有边上编辑工具。">
+            <IconInfoCircle />
+          </a-tooltip>
+        </div>
+      </template>
+      <a-checkbox-group
+        v-model="graph.lineTools"
+        :options="lineToolOptions" />
+    </a-form-item>
   </a-form>
 </template>
 
@@ -233,7 +246,7 @@ import { ColorPicker } from 'vue3-colorpicker';
 import 'vue3-colorpicker/style.css';
 import Switch from '../switch/index.vue';
 import { IconInfoCircle, IconBgColors } from '@arco-design/web-vue/es/icon';
-import { SelectOption } from '@arco-design/web-vue';
+import { SelectOption, CheckboxOption } from '@arco-design/web-vue';
 
 const props = defineProps<{
   property: GraphProperty;
@@ -324,6 +337,38 @@ const connectorOptions: SelectOption[] = [
   {
     label: '跳线连接器',
     value: 'jumpover',
+  },
+];
+//边上工具选项
+const lineToolOptions: CheckboxOption[] = [
+  {
+    label: '文本编辑工具',
+    value: 'edge-editor',
+  },
+
+  {
+    label: '起点修改工具',
+    value: 'source-arrowhead',
+  },
+  {
+    label: '终点修改工具',
+    value: 'target-arrowhead',
+  },
+  {
+    label: '路径点工具',
+    value: 'vertices',
+  },
+  {
+    label: '矩形框工具',
+    value: 'boundary',
+  },
+  {
+    label: '删除工具',
+    value: 'button-remove',
+  },
+  {
+    label: '线段工具',
+    value: 'segments',
   },
 ];
 

@@ -104,6 +104,7 @@ import {
   initGraphProperty,
   getMarker,
   getConnector,
+  getLineToos,
 } from './index';
 import { v4 } from 'uuid';
 import { IconSave, IconExport } from '@arco-design/web-vue/es/icon';
@@ -398,18 +399,7 @@ const initGraph = (container: HTMLDivElement) => {
               targetMarker: getMarker(curProperty.value.targetMarker),
             },
           },
-          tools: [
-            {
-              name: 'edge-editor',
-              args: {
-                attrs: {
-                  text: {
-                    fontSize: 15,
-                  },
-                },
-              },
-            },
-          ],
+          tools: getLineToos(curProperty.value.lineTools),
           zIndex: 0,
         });
         //获取线条样式
@@ -465,6 +455,18 @@ const initStencil = (graph: Graph) => {
         height: size.height * 2,
         width: size.width * 2,
       });
+      clone.addTools([
+        {
+          name: 'node-editor',
+          args: {
+            attrs: {
+              text: {
+                fontSize: 15,
+              },
+            },
+          },
+        },
+      ]);
       curTab.value = 'node';
       //获取node信息
       getNodeProperty(clone);
@@ -520,6 +522,20 @@ const registerGraphEvents = (graph: Graph) => {
     curNode.value.height = height;
     curNode.value.width = width;
   });
+  // graph.on('edge:mouseenter', ({ cell }) => {
+  //   cell.addTools(
+  //     getLineToos(curProperty.value.lineTools).filter(
+  //       (item) => item.name == 'edge-editor'
+  //     ) as any[]
+  //   );
+  // });
+  // graph.on('edge:mouseleave', ({ cell }) => {
+  //   cell.removeTools(
+  //     curProperty.value.lineTools.filter(
+  //       (item) => item == 'edge-editor'
+  //     ) as any[]
+  //   );
+  // });
 };
 
 //初始化页面

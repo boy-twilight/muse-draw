@@ -28,6 +28,66 @@ export const getMarker = (marker: string) => {
     : null;
 };
 
+//获得边上工具
+export const getLineToos = (lineTool: string[]) => {
+  const lineMapper: Map<string, Record<string, any>> = new Map([
+    [
+      'edge-editor',
+      {
+        name: 'edge-editor',
+        args: {
+          attrs: {
+            text: {
+              fontSize: 15,
+            },
+          },
+        },
+      },
+    ],
+    [
+      'vertices',
+      {
+        name: 'vertices',
+        modifiers: ['crtl', 'meta'],
+      },
+    ],
+    [
+      'segments',
+      {
+        name: 'segments',
+      },
+    ],
+    [
+      'boundary',
+      {
+        name: 'boundary',
+      },
+    ],
+    [
+      'button-remove',
+      {
+        name: 'button-remove',
+        args: {
+          distance: '50%',
+        },
+      },
+    ],
+    [
+      'source-arrowhead',
+      {
+        name: 'source-arrowhead',
+      },
+    ],
+    [
+      'target-arrowhead',
+      {
+        name: 'target-arrowhead',
+      },
+    ],
+  ]);
+  return lineTool.map((item) => lineMapper.get(item) as Record<string, any>);
+};
+
 //获取连接器基本数据
 export const getConnector = (connector: string) => {
   let args: Record<string, any> = {};
@@ -192,18 +252,6 @@ const createNodeProperty = (config: {
         },
       },
     },
-    tools: [
-      {
-        name: 'node-editor',
-        args: {
-          attrs: {
-            text: {
-              fontSize: 15,
-            },
-          },
-        },
-      },
-    ],
     ports: {
       groups: {
         top: createPortProperty('top'),
@@ -398,6 +446,7 @@ export const initLineProperty = (): GraphLine => {
   };
 };
 
+//初始化图的默认值
 export const initGraphProperty = (): GraphProperty => {
   return {
     background: '#ffffff',
@@ -424,5 +473,7 @@ export const initGraphProperty = (): GraphProperty => {
     router: 'manhattan',
     connector: 'rounded',
     snap: 20,
+    lineTools: ['edge-editor'],
+    nodeTools: ['node-editor'],
   };
 };

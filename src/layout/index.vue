@@ -2,7 +2,7 @@
   <a-layout class="container">
     <a-layout-sider class="side">
       <a-menu
-        :default-selected-keys="curKey"
+        v-model:selected-keys="curMenu"
         v-model:collapsed="isCollapse"
         @menu-item-click="handleClick"
         show-collapse-button
@@ -47,10 +47,11 @@ import { PAGE_DRAW, PAGE_HOME } from '@/constants/page';
 import { useRouter } from 'vue-router';
 import { ss } from '@/utils';
 import logo from '@/assets/image/logo.svg';
+import useDataStore from '@/store/data';
+import { storeToRefs } from 'pinia';
 
 const router = useRouter();
-//当前活跃的key
-const curKey = ref<string[]>(ss.get('curKey') || [PAGE_HOME]);
+const { curMenu } = storeToRefs(useDataStore());
 //菜单是否收缩
 const isCollapse = ref<boolean>(true);
 //logo大小
@@ -62,10 +63,9 @@ const mainSize = computed(
   () => `calc(100% - ${isCollapse.value ? 48 : 200}px)`
 );
 
+//处理菜单点击
 const handleClick = (key: string) => {
-  if (curKey.value[0] == key) return;
-  curKey.value = [key];
-  ss.set('curKey', [key]);
+  ss.set('curMenu', [key]);
   router.push(key);
 };
 </script>

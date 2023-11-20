@@ -40,10 +40,50 @@
             .arco-tabs {
               height: 100%;
               width: 100%;
-              .vc-color-wrap {
-                border-radius: 3px;
-                box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px,
-                  rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+              .arco-form {
+                .title {
+                  font-size: 16px;
+                  font-weight: 550;
+                  color: #000;
+                  margin-bottom: 15px;
+                }
+                .label {
+                  span {
+                    margin-right: 5px;
+                  }
+                }
+                .color {
+                  display: flex;
+                  align-items: center;
+                  .vc-color-wrap {
+                    border-radius: 3px;
+                    border: 1px solid #dfe3e8;
+                  }
+                  .arco-icon,
+                  .iconfont {
+                    color: #000;
+                  }
+                  .line-color {
+                    font-size: 12px;
+                    margin-right: 5px;
+                  }
+                }
+                .slider-container {
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  width: 100%;
+                  padding-left: 5px;
+                  .arco-slider {
+                    display: flex;
+                    .arco-input-wrapper {
+                      width: 50px;
+                      .arco-input {
+                        font-size: 12px;
+                      }
+                    }
+                  }
+                }
               }
               .footer {
                 display: flex;

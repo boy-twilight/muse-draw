@@ -3,12 +3,21 @@
     :model="property"
     label-align="left"
     auto-label-width>
+    <span class="title">画布属性：</span>
     <a-form-item
       label="背景色"
       field="background">
-      <ColorPicker
-        v-model:pureColor="graph.background"
-        format="hex6" />
+      <div class="color">
+        <ColorPicker
+          v-model:pureColor="graph.background"
+          format="hex6" />
+        <a-tag>
+          <template #icon>
+            <IconBgColors :size="16" />
+          </template>
+          {{ graph.background }}
+        </a-tag>
+      </div>
     </a-form-item>
     <a-form-item
       label="画布缩放"
@@ -34,9 +43,16 @@
       field="panning">
       <Switch v-model="graph.panning" />
     </a-form-item>
-    <a-form-item
-      label="节点嵌套"
-      field="embedding">
+    <a-form-item field="embedding">
+      <template #label>
+        <div class="label">
+          <span>节点嵌套</span>
+          <a-tooltip
+            content="是否允许一个节点在另外一个节点内部成为子节点，默认为true。">
+            <IconInfoCircle />
+          </a-tooltip>
+        </div>
+      </template>
       <Switch v-model="graph.embedding" />
     </a-form-item>
     <a-form-item field="allowBlank">
@@ -142,6 +158,71 @@
       </template>
       <Switch v-model="graph.arrowheadMovable" />
     </a-form-item>
+    <span class="title">线条属性：</span>
+    <a-form-item
+      label="起点箭头"
+      field="sourceMarker">
+      <a-select
+        v-model="graph.sourceMarker"
+        placeholder="请选择起点箭头类型"
+        :options="markerOptions" />
+    </a-form-item>
+    <a-form-item
+      label="终点箭头"
+      field="targetMarker">
+      <a-select
+        v-model="graph.targetMarker"
+        placeholder="请选择终点箭头类型"
+        :options="markerOptions" />
+    </a-form-item>
+    <a-form-item field="router">
+      <template #label>
+        <div class="label">
+          <span>路由模式</span>
+          <a-tooltip
+            content="路由将边的路径点 vertices 做进一步转换处理，并在必要时添加额外的点，然后返回处理后的点（不包含边的起点和终点）。例如，经过 orth 路由处理后，边的每一条线段都是水平或垂直的正交线段，默认为	智能正交路由。">
+            <IconInfoCircle />
+          </a-tooltip>
+        </div>
+      </template>
+      <a-select
+        v-model="graph.router"
+        placeholder="请选择路由模式"
+        :options="routerOptions" />
+    </a-form-item>
+    <a-form-item field="connector">
+      <template #label>
+        <div class="label">
+          <span>连接器</span>
+          <a-tooltip
+            content="连接起点、终点、路有点的连线类型，默认值为圆角连接器">
+            <IconInfoCircle />
+          </a-tooltip>
+        </div>
+      </template>
+      <a-select
+        v-model="graph.connector"
+        placeholder="请选择连接器"
+        :options="connectorOptions" />
+    </a-form-item>
+    <a-form-item field="snap">
+      <template #label>
+        <div class="label">
+          <span>自动吸附</span>
+          <a-tooltip
+            content="开启和关闭连线过程中自动吸附，数值大小代表吸附距离，默认值是20px。">
+            <IconInfoCircle />
+          </a-tooltip>
+        </div>
+      </template>
+      <div class="slider-container">
+        <a-slider
+          v-model.lazy="graph.snap"
+          :min="1"
+          :max="100"
+          show-input />
+      </div>
+    </a-form-item>
   </a-form>
 </template>
 
@@ -151,7 +232,8 @@ import { ref, toRefs } from 'vue';
 import { ColorPicker } from 'vue3-colorpicker';
 import 'vue3-colorpicker/style.css';
 import Switch from '../switch/index.vue';
-import { IconInfoCircle } from '@arco-design/web-vue/es/icon';
+import { IconInfoCircle, IconBgColors } from '@arco-design/web-vue/es/icon';
+import { SelectOption } from '@arco-design/web-vue';
 
 const props = defineProps<{
   property: GraphProperty;
@@ -159,6 +241,91 @@ const props = defineProps<{
 const { property } = toRefs(props);
 //画布属性
 const graph = ref<GraphProperty>(property.value);
+//箭头选项
+const markerOptions: SelectOption[] = [
+  {
+    label: '没有箭头',
+    value: 'none',
+  },
+  {
+    label: '实心箭头',
+    value: 'block',
+  },
+  {
+    label: '经典箭头',
+    value: 'classic',
+  },
+  {
+    label: '菱形箭头',
+    value: 'diamond',
+  },
+  {
+    label: '圆形箭头',
+    value: 'circle',
+  },
+  {
+    label: '圆形和加号箭头',
+    value: 'circlePlus',
+  },
+  {
+    label: '椭圆箭头',
+    value: 'ellipse',
+  },
+  {
+    label: '交叉箭头',
+    value: 'cross',
+  },
+  {
+    label: 'async',
+    value: 'async',
+  },
+];
+//连接器选项
+const routerOptions: SelectOption[] = [
+  {
+    label: '内置路由',
+    value: 'normal',
+  },
+  {
+    label: '正交路由',
+    value: 'orth',
+  },
+  {
+    label: '受限正交路由',
+    value: 'oneSide',
+  },
+  {
+    label: '智能正交路由',
+    value: 'manhattan',
+  },
+  {
+    label: '智能地铁线路由',
+    value: 'metro',
+  },
+  {
+    label: '实体关系路由',
+    value: 'er',
+  },
+];
+//连接器选项
+const connectorOptions: SelectOption[] = [
+  {
+    label: '简单连接器',
+    value: 'normal',
+  },
+  {
+    label: '平滑连接器',
+    value: 'smooth',
+  },
+  {
+    label: '圆角连接器',
+    value: 'rounded',
+  },
+  {
+    label: '跳线连接器',
+    value: 'jumpover',
+  },
+];
 
 defineExpose({
   getFormValue(): GraphProperty {
@@ -166,33 +333,3 @@ defineExpose({
   },
 });
 </script>
-
-<style lang="less" scoped>
-.arco-form {
-  &:deep(.arco-form-item-label) {
-    .label {
-      span {
-        margin-right: 5px;
-      }
-    }
-  }
-  &:deep(.arco-form-item-content) {
-    .slider-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      padding-left: 5px;
-      .arco-slider {
-        display: flex;
-        .arco-input-wrapper {
-          width: 50px;
-          .arco-input {
-            font-size: 12px;
-          }
-        }
-      }
-    }
-  }
-}
-</style>

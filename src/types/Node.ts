@@ -23,12 +23,8 @@ export interface GraphNode {
 export interface GraphLine {
   strokeColor: string;
   strokeWidth: number;
-  sourceMarker: string;
-  targetMarker: string;
   markerHeight: number;
   markerWidth: number;
-  // fontSize: number;
-  // fontColor: string;
 }
 
 export interface GraphProperty {
@@ -61,4 +57,14 @@ export interface GraphProperty {
   vertexMovable: boolean;
   vertexAddable: boolean;
   vertexDeletable: boolean;
+  //起点箭头类型
+  sourceMarker: string;
+  //终点箭头类型
+  targetMarker: string;
+  //路由类型
+  router: string;
+  //连接器
+  connector: string;
+  //自动吸附
+  snap: number;
 }

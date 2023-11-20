@@ -17,6 +17,34 @@ export const showPorts = (ports: NodeListOf<SVGElement>, show: boolean) => {
   }
 };
 
+//获得箭头数据
+export const getMarker = (marker: string) => {
+  return marker != 'none'
+    ? {
+        name: marker,
+        width: 12,
+        height: 8,
+      }
+    : null;
+};
+
+//获取连接器基本数据
+export const getConnector = (connector: string) => {
+  let args: Record<string, any> = {};
+  if (connector == 'rounded') {
+    args = {
+      radius: 8,
+    };
+  } else {
+    args = {
+      radius: 8,
+      type: 'arc',
+      size: 8,
+    };
+  }
+  return args;
+};
+
 //注册插件
 export const registerPlugin = (graph: Graph) => {
   graph
@@ -367,10 +395,6 @@ export const initLineProperty = (): GraphLine => {
     strokeWidth: 0,
     markerHeight: 0,
     markerWidth: 0,
-    sourceMarker: '',
-    targetMarker: '',
-    // fontSize: 0,
-    // fontColor: '',
   };
 };
 
@@ -395,5 +419,10 @@ export const initGraphProperty = (): GraphProperty => {
     vertexMovable: true,
     vertexAddable: true,
     vertexDeletable: true,
+    sourceMarker: 'none',
+    targetMarker: 'block',
+    router: 'manhattan',
+    connector: 'rounded',
+    snap: 20,
   };
 };

@@ -20,7 +20,7 @@
               <a-tabs v-model:active-key="curTab">
                 <a-tab-pane
                   key="global"
-                  title="画布属性">
+                  title="全局属性">
                   <a-scrollbar style="height: 83vh; overflow: auto">
                     <GraphPropertyForm
                       :property="curProperty"
@@ -102,6 +102,8 @@ import {
   initNodeProperty,
   initLineProperty,
   initGraphProperty,
+  getMarker,
+  getConnector,
 } from './index';
 import { v4 } from 'uuid';
 import { IconSave, IconExport } from '@arco-design/web-vue/es/icon';
@@ -191,21 +193,14 @@ const getLineProperty = (cell: Cell<Node.Properties>) => {
   curType.value = 'line';
   const attrs = cell.getAttrs();
   const {
-    line: { stroke, strokeWidth, sourceMarker, targetMarker },
+    line: { stroke, strokeWidth, targetMarker },
   } = attrs;
-  const source = Object(sourceMarker);
-  const target = Object(targetMarker);
-  const { name: sourceName } = source;
-  const { name: targetName, height, width } = target;
+  const { height, width } = Object(targetMarker);
   curLine.value = {
     strokeWidth: Number(strokeWidth),
     strokeColor: String(stroke),
-    sourceMarker: sourceName ? sourceName : 'none',
-    targetMarker: targetName ? targetName : 'none',
     markerHeight: height ? height : 0,
     markerWidth: width ? width : 0,
-    // fontColor: '',
-    // fontSize: 0,
   };
 };
 
@@ -242,52 +237,19 @@ const onNodePropertyChange = (val: GraphNode) => {
 //设置线条属性的时候
 const onLinePropertyChange = (val: GraphLine) => {
   const cell = graph.value!.getCellById(curId.value);
-  const {
-    markerWidth,
-    markerHeight,
-    strokeWidth,
-    strokeColor,
-    targetMarker,
-    sourceMarker,
-  } = val;
-  const targetMarkerData =
-    targetMarker == 'none'
-      ? {
-          name: 'block',
-          height: 0,
-          width: 0,
-          stroke: 'transparent',
-          fill: 'transparent',
-        }
-      : {
-          name: targetMarker,
-          height: markerHeight,
-          width: markerWidth,
-          stroke: strokeWidth,
-          fill: strokeColor,
-        };
-  const sourceMarkerData =
-    sourceMarker == 'none'
-      ? {
-          name: 'block',
-          height: 0,
-          width: 0,
-          stroke: 'transparent',
-          fill: 'transparent',
-        }
-      : {
-          name: sourceMarker,
-          height: markerHeight,
-          width: markerWidth,
-          stroke: strokeWidth,
-          fill: strokeColor,
-        };
+  const { markerWidth, markerHeight, strokeWidth, strokeColor } = val;
   cell.setAttrs({
     line: {
       stroke: strokeColor,
       strokeWidth,
-      sourceMarker: sourceMarkerData,
-      targetMarker: targetMarkerData,
+      sourceMarker: {
+        height: markerHeight,
+        width: markerWidth,
+      },
+      targetMarker: {
+        height: markerHeight,
+        width: markerWidth,
+      },
     },
   });
   curLine.value = val;
@@ -406,19 +368,17 @@ const initGraph = (container: HTMLDivElement) => {
     // 连接
     connecting: {
       //这三个属性决定线条类型和连接位置
-      router: 'manhattan',
+      router: curProperty.value.router,
       anchor: 'center',
       connectionPoint: 'anchor',
       //连接器
       connector: {
-        name: 'rounded',
-        args: {
-          radius: 8,
-        },
+        name: curProperty.value.connector,
+        args: getConnector(curProperty.value.connector),
       },
       //自动吸附，指定吸附距离
       snap: {
-        radius: 20,
+        radius: curProperty.value.snap,
       },
       allowBlank: curProperty.value.allowBlank,
       allowEdge: curProperty.value.allowEdge,
@@ -432,13 +392,10 @@ const initGraph = (container: HTMLDivElement) => {
         const edge = new Shape.Edge({
           attrs: {
             line: {
-              stroke: '#000',
+              stroke: '#000000',
               strokeWidth: 2,
-              targetMarker: {
-                name: 'block',
-                width: 12,
-                height: 8,
-              },
+              sourceMarker: getMarker(curProperty.value.sourceMarker),
+              targetMarker: getMarker(curProperty.value.targetMarker),
             },
           },
           tools: [

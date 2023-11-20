@@ -28,9 +28,17 @@
     <a-form-item
       label="填充颜色"
       field="background">
-      <ColorPicker
-        v-model:pureColor="node.background"
-        format="hex6" />
+      <div class="color">
+        <ColorPicker
+          v-model:pureColor="node.background"
+          format="hex6" />
+        <a-tag>
+          <template #icon>
+            <IconBgColors :size="16" />
+          </template>
+          {{ node.background }}
+        </a-tag>
+      </div>
     </a-form-item>
     <a-form-item
       label="字体大小"
@@ -46,9 +54,17 @@
     <a-form-item
       label="字体颜色"
       field="fontColor">
-      <ColorPicker
-        v-model:pureColor="node.fontColor"
-        format="hex6" />
+      <div class="color">
+        <ColorPicker
+          v-model:pureColor="node.fontColor"
+          format="hex6" />
+        <a-tag>
+          <template #icon>
+            <IconFontColors :size="15" />
+          </template>
+          {{ node.fontColor }}
+        </a-tag>
+      </div>
     </a-form-item>
     <a-form-item
       label="水平对齐"
@@ -88,9 +104,17 @@
     <a-form-item
       label="线条颜色"
       field="borderColor">
-      <ColorPicker
-        v-model:pureColor="node.borderColor"
-        format="hex6" />
+      <div class="color">
+        <ColorPicker
+          v-model:pureColor="node.borderColor"
+          format="hex6" />
+        <a-tag>
+          <template #icon>
+            <span class="iconfont line-color">&#xe624;</span>
+          </template>
+          {{ node.borderColor }}
+        </a-tag>
+      </div>
     </a-form-item>
   </a-form>
 </template>
@@ -101,6 +125,7 @@ import { ref, toRefs, watch } from 'vue';
 import { cloneDeep, isEqual } from 'lodash-es';
 import { ColorPicker } from 'vue3-colorpicker';
 import 'vue3-colorpicker/style.css';
+import { IconBgColors, IconFontColors } from '@arco-design/web-vue/es/icon';
 
 const props = defineProps<{
   property: GraphNode;
@@ -138,26 +163,3 @@ watch(
   }
 );
 </script>
-
-<style lang="less" scoped>
-.arco-form {
-  &:deep(.arco-form-item-content) {
-    .slider-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      padding-left: 5px;
-      .arco-slider {
-        display: flex;
-        .arco-input-wrapper {
-          width: 50px;
-          .arco-input {
-            font-size: 12px;
-          }
-        }
-      }
-    }
-  }
-}
-</style>

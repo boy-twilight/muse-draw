@@ -49,15 +49,7 @@
             data-index="updateTime" />
           <a-table-column title="操作">
             <template #cell="{ record }">
-              <a-link
-                @click="
-                  router.push({
-                    path: PAGE_DRAW,
-                    query: {
-                      id: record.id,
-                    },
-                  })
-                ">
+              <a-link @click="goEdit(record)">
                 <template #icon>
                   <IconEdit />
                 </template>
@@ -95,14 +87,15 @@
 import { ref, computed, onMounted } from 'vue';
 import { IconEdit, IconDelete } from '@arco-design/web-vue/es/icon';
 import { Message } from '@arco-design/web-vue';
-import { ls, warning } from '@/utils';
+import { ls, ss, warning } from '@/utils';
 import { useRouter } from 'vue-router';
 import { PAGE_DRAW } from '@/constants/page';
 import useDataStore from '@/store/data';
 import { storeToRefs } from 'pinia';
+import { UserData } from '@/types/node';
 
 const router = useRouter();
-const { userData } = storeToRefs(useDataStore());
+const { userData, curMenu } = storeToRefs(useDataStore());
 //当前的选择的列的key
 const curKeys = ref<string[]>([]);
 //搜索关键字
@@ -136,6 +129,18 @@ const deleteSelect = () => {
         (item) => !curKeys.value.includes(item.id)
       );
       curKeys.value = [];
+    },
+  });
+};
+
+//前往编辑页面
+const goEdit = (record: UserData) => {
+  curMenu.value = [PAGE_DRAW];
+  ss.set('curMenu', curMenu.value);
+  router.push({
+    path: PAGE_DRAW,
+    query: {
+      id: record.id,
     },
   });
 };

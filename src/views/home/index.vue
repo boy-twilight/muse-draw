@@ -154,6 +154,7 @@ onMounted(() => {
   width: 100%;
   .arco-card {
     height: 100%;
+    border-radius: 10px;
     .header {
       margin: 10px 0;
       display: flex;

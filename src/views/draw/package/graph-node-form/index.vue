@@ -117,7 +117,6 @@ import { ref, toRefs, watch } from 'vue';
 import { cloneDeep, isEqual } from 'lodash-es';
 import { ColorPicker } from 'vue3-colorpicker';
 import 'vue3-colorpicker/style.css';
-import { initNodeProperty } from '@/views/draw';
 
 const props = defineProps<{
   property: GraphNode;
@@ -129,7 +128,7 @@ const emits = defineEmits<{
 
 const { property } = toRefs(props);
 //当前节点
-const node = ref<GraphNode>(initNodeProperty());
+const node = ref<GraphNode>(property.value);
 //验证规则
 const rules: Record<string, FieldRule> = {
   width: {

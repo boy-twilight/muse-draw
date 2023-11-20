@@ -21,13 +21,28 @@
                 <a-tab-pane
                   key="global"
                   title="画布属性">
+                  <a-scrollbar style="height: 83vh; overflow: auto">
+                    <GraphPropertyForm
+                      :property="curProperty"
+                      ref="propertyForm" />
+                    <div class="footer">
+                      <a-button
+                        type="primary"
+                        @click="saveSetting">
+                        <template #icon>
+                          <IconSave />
+                        </template>
+                        保存设置
+                      </a-button>
+                    </div>
+                  </a-scrollbar>
                 </a-tab-pane>
                 <a-tab-pane
                   key="node"
                   title="节点属性">
                   <a-scrollbar
                     v-show="curId"
-                    style="height: 76.3vh; overflow: auto">
+                    style="height: 82vh; overflow: auto">
                     <GraphNodeForm
                       :property="curNode"
                       @change="onNodePropertyChange"
@@ -86,14 +101,20 @@ import {
   registerPlugin,
   initNodeProperty,
   initLineProperty,
+  initGraphProperty,
 } from './index';
 import { v4 } from 'uuid';
 import { IconSave, IconExport } from '@arco-design/web-vue/es/icon';
 import { Message } from '@arco-design/web-vue';
 import { useRoute } from 'vue-router';
-import { UserData, GraphNode, GraphLine } from '@/types/node';
-import { format } from '@/utils';
-import { DrawForm, GraphLineForm, GraphNodeForm } from './package';
+import { UserData, GraphNode, GraphLine, GraphProperty } from '@/types/node';
+import { format, ls } from '@/utils';
+import {
+  DrawForm,
+  GraphLineForm,
+  GraphNodeForm,
+  GraphPropertyForm,
+} from './package';
 import useDataStore from '@/store/data';
 import { storeToRefs } from 'pinia';
 
@@ -114,7 +135,7 @@ const curDraw = ref<UserData>({
   name: '',
   desc: '',
   data: '',
-  exportType: '',
+  exportType: 'png',
   createTime: '',
   updateTime: '',
 });
@@ -128,8 +149,14 @@ const curNode = ref<GraphNode>(initNodeProperty());
 const curLine = ref<GraphLine>(initLineProperty());
 //当前操作的属性tab
 const curTab = ref<'draw' | 'node' | 'global'>('global');
-//全局属性表单的实例
+//画布属性
+const curProperty = ref<GraphProperty>(
+  ls.get('setting') || initGraphProperty()
+);
+//绘画记录表单的实例
 const drawForm = ref<InstanceType<typeof DrawForm>>();
+//全局属性表单实例
+const propertyForm = ref<InstanceType<typeof GraphPropertyForm>>();
 //面板分隔
 const size = ref<number>(0.73);
 
@@ -177,8 +204,8 @@ const getLineProperty = (cell: Cell<Node.Properties>) => {
     targetMarker: targetName ? targetName : 'none',
     markerHeight: height ? height : 0,
     markerWidth: width ? width : 0,
-    fontColor: '',
-    fontSize: 0,
+    // fontColor: '',
+    // fontSize: 0,
   };
 };
 
@@ -274,7 +301,6 @@ const getDrawForm = (key: string, value: string) => {
 //导出图
 const exportGraph = () => {
   const { exportType } = curDraw.value;
-  if (!exportType) return Message.error('请先保存过后再进行导出！');
   if (exportType == 'png') {
     graph.value!.exportPNG();
   } else if (exportType == 'jpeg') {
@@ -307,6 +333,20 @@ const saveGraph = async () => {
   }
 };
 
+//初始化画布设置
+const initSetting = () => {
+  const { panning } = curProperty.value;
+  if (!panning) {
+    graph.value?.disablePanning();
+  }
+};
+
+//保存设置
+const saveSetting = () => {
+  ls.set('setting', propertyForm.value!.getFormValue());
+  location.reload();
+};
+
 //获取页面初始值
 const getPageVal = () => {
   const target = userData.value.find((item) => item.id == id);
@@ -327,6 +367,9 @@ const getPageVal = () => {
 const initGraph = (container: HTMLDivElement) => {
   return new Graph({
     container: container,
+    background: {
+      color: curProperty.value.background,
+    },
     grid: {
       type: 'doubleMesh',
       size: 12,
@@ -344,20 +387,21 @@ const initGraph = (container: HTMLDivElement) => {
       ],
     },
     //是否允许子节点
-    embedding: true,
+    embedding: curProperty.value.embedding,
     // 缩放
     mousewheel: {
-      enabled: true,
+      enabled: curProperty.value.mousewheel,
       zoomAtMousePosition: true,
       modifiers: ['ctrl', 'meta'],
-      minScale: 0.2,
-      maxScale: 3,
+      minScale: curProperty.value.scale[0],
+      maxScale: curProperty.value.scale[1],
     },
     // 交互
     interacting: {
-      edgeLabelMovable: true,
-      edgeMovable: true,
-      arrowheadMovable: true,
+      edgeLabelMovable: curProperty.value.edgeLabelMovable,
+      edgeMovable: curProperty.value.edgeMovable,
+      arrowheadMovable: curProperty.value.arrowheadMovable,
+      nodeMovable: curProperty.value.nodeMovable,
     },
     // 连接
     connecting: {
@@ -376,8 +420,13 @@ const initGraph = (container: HTMLDivElement) => {
       snap: {
         radius: 20,
       },
-      //允许空白连接
-      allowBlank: true,
+      allowBlank: curProperty.value.allowBlank,
+      allowEdge: curProperty.value.allowEdge,
+      allowPort: curProperty.value.allowPort,
+      allowLoop: curProperty.value.allowLoop,
+      allowMulti: curProperty.value.allowMulti,
+      allowNode: curProperty.value.allowNode,
+      highlight: curProperty.value.highlight,
       //连接时，创建边
       createEdge() {
         const edge = new Shape.Edge({
@@ -524,6 +573,7 @@ const initPage = async () => {
   initStencil(graph.value as Graph);
   registerKeyEvents(graph.value as Graph);
   registerGraphEvents(graph.value as Graph);
+  initSetting();
   await nextTick();
   getPageVal();
 };

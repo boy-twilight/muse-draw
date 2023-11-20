@@ -49,6 +49,7 @@ import {
   FieldRule,
   SelectOption,
 } from '@arco-design/web-vue';
+import { cloneDeep } from 'lodash-es';
 
 const props = defineProps<{
   model: UserData;
@@ -59,15 +60,7 @@ const emits = defineEmits<{
 }>();
 
 const { model } = toRefs(props);
-const form = ref<UserData>({
-  id: '',
-  name: '',
-  desc: '',
-  data: '',
-  exportType: '',
-  updateTime: '',
-  createTime: '',
-});
+const form = ref<UserData>(model.value);
 const rules: Record<string, FieldRule> = {
   name: {
     message: '绘图名称必须填写',
@@ -95,7 +88,7 @@ const formIns = ref<InstanceType<typeof Form>>();
 watch(
   model,
   (val) => {
-    form.value = { ...val };
+    form.value = cloneDeep(val);
   },
   {
     deep: true,

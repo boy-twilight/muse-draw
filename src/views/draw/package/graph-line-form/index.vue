@@ -101,7 +101,6 @@ import { ref, toRefs, watch } from 'vue';
 import { ColorPicker } from 'vue3-colorpicker';
 import 'vue3-colorpicker/style.css';
 import { isEqual, cloneDeep } from 'lodash-es';
-import { initLineProperty } from '@/views/draw';
 
 const props = defineProps<{
   property: GraphLine;
@@ -113,7 +112,7 @@ const emits = defineEmits<{
 
 const { property } = toRefs(props);
 //当前线条
-const line = ref<GraphLine>(initLineProperty());
+const line = ref<GraphLine>(property.value);
 //验证规则
 const rules: Record<string, FieldRule> = {
   strokeWidth: {

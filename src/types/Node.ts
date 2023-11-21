@@ -67,6 +67,8 @@ export interface GraphProperty {
   connector: string;
   //自动吸附
   snap: number;
+  //线条类型
+  lineType: string;
   //边上工具
   lineTools: string[];
   //节点工具

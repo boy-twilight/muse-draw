@@ -12,7 +12,7 @@ import { GraphLine, GraphNode, GraphProperty } from '@/types/node';
 
 //控制连接桩的显示
 export const showPorts = (ports: NodeListOf<SVGElement>, show: boolean) => {
-  for (let i = 0, len = ports.length; i < len; i += 1) {
+  for (let i = 0; i < ports.length; i++) {
     ports[i].style.visibility = show ? 'visible' : 'hidden';
   }
 };
@@ -48,7 +48,6 @@ export const getLineToos = (lineTool: string[]) => {
       'vertices',
       {
         name: 'vertices',
-        modifiers: ['crtl', 'meta'],
       },
     ],
     [
@@ -61,6 +60,9 @@ export const getLineToos = (lineTool: string[]) => {
       'boundary',
       {
         name: 'boundary',
+        args: {
+          padding: 15,
+        },
       },
     ],
     [
@@ -472,6 +474,7 @@ export const initGraphProperty = (): GraphProperty => {
     targetMarker: 'block',
     router: 'manhattan',
     connector: 'rounded',
+    lineType: '',
     snap: 20,
     lineTools: ['edge-editor'],
     nodeTools: ['node-editor'],

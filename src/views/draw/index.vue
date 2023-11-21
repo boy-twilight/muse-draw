@@ -397,6 +397,7 @@ const initGraph = (container: HTMLDivElement) => {
               strokeWidth: 2,
               sourceMarker: getMarker(curProperty.value.sourceMarker),
               targetMarker: getMarker(curProperty.value.targetMarker),
+              'stroke-dasharray': curProperty.value.lineType,
             },
           },
           tools: getLineToos(curProperty.value.lineTools),
@@ -522,20 +523,6 @@ const registerGraphEvents = (graph: Graph) => {
     curNode.value.height = height;
     curNode.value.width = width;
   });
-  // graph.on('edge:mouseenter', ({ cell }) => {
-  //   cell.addTools(
-  //     getLineToos(curProperty.value.lineTools).filter(
-  //       (item) => item.name == 'edge-editor'
-  //     ) as any[]
-  //   );
-  // });
-  // graph.on('edge:mouseleave', ({ cell }) => {
-  //   cell.removeTools(
-  //     curProperty.value.lineTools.filter(
-  //       (item) => item == 'edge-editor'
-  //     ) as any[]
-  //   );
-  // });
 };
 
 //初始化页面

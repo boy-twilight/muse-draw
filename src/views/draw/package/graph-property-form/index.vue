@@ -160,6 +160,14 @@
     </a-form-item>
     <span class="title">线条属性：</span>
     <a-form-item
+      label="线条类型"
+      field="lineType">
+      <a-radio-group v-model="graph.lineType">
+        <a-radio value="">实线</a-radio>
+        <a-radio value="7,7">虚线</a-radio>
+      </a-radio-group>
+    </a-form-item>
+    <a-form-item
       label="起点箭头"
       field="sourceMarker">
       <a-select

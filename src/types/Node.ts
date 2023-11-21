@@ -11,6 +11,7 @@ export interface UserData {
 export interface GraphNode {
   width: number;
   height: number;
+  lineHeight: number;
   fontSize: number;
   fontColor: string;
   borderColor: string;
@@ -28,6 +29,9 @@ export interface GraphLine {
 }
 
 export interface GraphProperty {
+  bgMode: string;
+  bgImage: string;
+  opacity: number;
   background: string;
   //是否允许缩放，以及最大最小缩放倍率
   mousewheel: boolean;

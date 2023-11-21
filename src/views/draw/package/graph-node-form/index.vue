@@ -91,6 +91,17 @@
       </a-radio-group>
     </a-form-item>
     <a-form-item
+      label="行高"
+      field="lineHeight">
+      <div class="slider-container">
+        <a-slider
+          v-model.lazy="node.lineHeight"
+          :min="10"
+          :max="100"
+          show-input />
+      </div>
+    </a-form-item>
+    <a-form-item
       label="线条宽度"
       field="borderSize">
       <div class="slider-container">

@@ -173,7 +173,13 @@ const getNodeProperty = (cell: Cell<Node.Properties>) => {
   const { width, height } = cell.getProp('size')!;
   const {
     body: { fill, stroke, strokeWidth },
-    text: { fill: fontColor, fontSize, textAnchor, textVerticalAnchor },
+    text: {
+      fill: fontColor,
+      fontSize,
+      textAnchor,
+      textVerticalAnchor,
+      lineHeight,
+    },
   } = attrs;
   curNode.value = {
     width,
@@ -184,6 +190,7 @@ const getNodeProperty = (cell: Cell<Node.Properties>) => {
     borderSize: Number(strokeWidth),
     background: String(fill),
     textAnchor: String(textAnchor),
+    lineHeight: Number(lineHeight),
     textVerticalAnchor: String(textVerticalAnchor),
   };
 };
@@ -218,6 +225,7 @@ const onNodePropertyChange = (val: GraphNode) => {
     textVerticalAnchor,
     height,
     width,
+    lineHeight,
   } = val;
   cell.setAttrs({
     body: { fill: background, stroke: borderColor, strokeWidth: borderSize },
@@ -226,6 +234,7 @@ const onNodePropertyChange = (val: GraphNode) => {
       fontSize,
       textAnchor: textAnchor,
       textVerticalAnchor: textVerticalAnchor,
+      lineHeight,
     },
   });
   cell.setProp('size', {
@@ -331,7 +340,15 @@ const initGraph = (container: HTMLDivElement) => {
   return new Graph({
     container: container,
     background: {
-      color: curProperty.value.background,
+      color:
+        curProperty.value.bgMode == 'color'
+          ? 'transparent'
+          : curProperty.value.background,
+      image:
+        curProperty.value.bgMode == 'color' ? '' : curProperty.value.bgImage,
+      opacity: curProperty.value.opacity,
+      position: 'center',
+      // size: 'cover',
     },
     grid: {
       type: 'doubleMesh',

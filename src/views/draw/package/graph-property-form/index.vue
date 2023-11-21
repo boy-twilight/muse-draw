@@ -5,6 +5,45 @@
     auto-label-width>
     <span class="title">画布属性：</span>
     <a-form-item
+      label="背景模式"
+      field="bgMode">
+      <a-radio-group v-model="graph.bgMode">
+        <a-radio value="color">纯色背景</a-radio>
+        <a-radio value="image">图像背景</a-radio>
+      </a-radio-group>
+    </a-form-item>
+    <a-form-item
+      label="背景图像"
+      field="bgImage"
+      v-show="graph.bgMode == 'image'">
+      <div class="upload">
+        <a-image
+          width="150"
+          height="150"
+          :src="graph.bgImage"
+          style="cursor: pointer" />
+        <a-button @click="uploadImage">
+          <template #icon>
+            <IconUpload />
+          </template>
+          上传
+        </a-button>
+      </div>
+    </a-form-item>
+    <a-form-item
+      label="背景透明度"
+      field="opacity"
+      v-show="graph.bgMode == 'image'">
+      <div class="slider-container">
+        <a-slider
+          v-model.lazy="graph.opacity"
+          :min="0.1"
+          :max="1"
+          :step="0.1"
+          show-input />
+      </div>
+    </a-form-item>
+    <a-form-item
       label="背景色"
       field="background">
       <div class="color">
@@ -253,8 +292,13 @@ import { ref, toRefs } from 'vue';
 import { ColorPicker } from 'vue3-colorpicker';
 import 'vue3-colorpicker/style.css';
 import Switch from '../switch/index.vue';
-import { IconInfoCircle, IconBgColors } from '@arco-design/web-vue/es/icon';
-import { SelectOption, CheckboxOption } from '@arco-design/web-vue';
+import {
+  IconInfoCircle,
+  IconBgColors,
+  IconUpload,
+} from '@arco-design/web-vue/es/icon';
+import { SelectOption, CheckboxOption, Message } from '@arco-design/web-vue';
+import { compressImage } from '@/utils';
 
 const props = defineProps<{
   property: GraphProperty;
@@ -379,6 +423,27 @@ const lineToolOptions: CheckboxOption[] = [
     value: 'segments',
   },
 ];
+
+//上传图像
+const uploadImage = () => {
+  const upload = document.createElement('input');
+  upload.type = 'file';
+  upload.accept = '.png,.jpeg,.jpg,.gif,.bmp';
+  upload.style.display = 'none';
+  upload.onchange = async (e: any) => {
+    const files = e.target.files;
+    if (files.length <= 0) return;
+    const file = files[0];
+    if (!/\.(jpg|jpeg|png|gif|bmp)$/i.test(file.name)) {
+      return Message.error('请上传图像文件');
+    }
+    const imageUrl = await compressImage(file, 4320, 7680, 0.6);
+    graph.value.bgImage = imageUrl;
+  };
+  document.body.appendChild(upload);
+  upload.click();
+  document.body.removeChild(upload);
+};
 
 defineExpose({
   getFormValue(): GraphProperty {

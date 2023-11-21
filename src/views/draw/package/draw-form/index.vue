@@ -2,7 +2,6 @@
   <a-form
     :model="form"
     :rules="rules"
-    layout="vertical"
     label-align="left"
     auto-label-width
     ref="formIns">

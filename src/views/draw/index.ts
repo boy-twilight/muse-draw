@@ -244,6 +244,7 @@ const createNodeProperty = (config: {
         fill: '#262626',
         textAnchor: 'middle',
         textVerticalAnchor: 'middle',
+        lineHeight: 12,
       },
       label: {
         textWrap: {
@@ -430,6 +431,7 @@ export const initNodeProperty = (): GraphNode => {
     height: 0,
     fontColor: '',
     fontSize: 0,
+    lineHeight: 0,
     background: '',
     borderColor: '',
     borderSize: 0,
@@ -451,6 +453,9 @@ export const initLineProperty = (): GraphLine => {
 //初始化图的默认值
 export const initGraphProperty = (): GraphProperty => {
   return {
+    bgImage: '',
+    bgMode: 'color',
+    opacity: 0.6,
     background: '#ffffff',
     mousewheel: true,
     scale: [0.3, 3],

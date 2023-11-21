@@ -24,3 +24,41 @@ export const warning = (config: ModalConfig) => {
     onCancel,
   });
 };
+
+export const compressImage = (
+  file: File,
+  maxWidth: number,
+  maxHeight: number,
+  quality: number
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    if (!context) {
+      return reject(new Error('Failed to get canvas 2D context.'));
+    }
+    const image = new Image();
+    image.src = URL.createObjectURL(file);
+    image.onload = () => {
+      let targetWidth = image.width;
+      let targetHeight = image.height;
+      if (targetWidth > maxWidth || targetHeight > maxHeight) {
+        const ratio = Math.min(
+          maxWidth / targetWidth,
+          maxHeight / targetHeight
+        );
+        targetWidth *= ratio;
+        targetHeight *= ratio;
+      }
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      context.clearRect(0, 0, targetWidth, targetHeight);
+      context.drawImage(image, 0, 0, targetWidth, targetHeight);
+      resolve(canvas.toDataURL(file.type, quality));
+    };
+
+    image.onerror = (err) => {
+      reject(err);
+    };
+  });
+};

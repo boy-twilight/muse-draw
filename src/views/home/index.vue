@@ -27,6 +27,9 @@
         :row-selection="{
           showCheckedAll: true,
           fixed: true,
+        }"
+        :scroll="{
+          maxHeight: '79vh',
         }">
         <template #columns>
           <a-table-column
@@ -74,7 +77,7 @@
           :total="userData.length"
           v-model:current="curPage"
           v-model:page-size="pageSize"
-          :page-size-options="[10, 20, 30, 40, 50]"
+          :page-size-options="[20, 30, 40, 50, 60]"
           show-total
           show-jumper
           show-page-size />
@@ -103,7 +106,7 @@ const keyWords = ref<string>('');
 //当前页码
 const curPage = ref<number>(1);
 //分页大小
-const pageSize = ref<number>(10);
+const pageSize = ref<number>(20);
 //当前显示的表格
 const curShow = computed(() =>
   userData.value

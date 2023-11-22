@@ -382,6 +382,9 @@ const initGraph = (container: HTMLDivElement) => {
       edgeMovable: curProperty.value.edgeMovable,
       arrowheadMovable: curProperty.value.arrowheadMovable,
       nodeMovable: curProperty.value.nodeMovable,
+      vertexMovable: curProperty.value.vertexMovable,
+      vertexAddable: curProperty.value.vertexAddable,
+      vertexDeletable: curProperty.value.vertexDeletable,
     },
     // 连接
     connecting: {

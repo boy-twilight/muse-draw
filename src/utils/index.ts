@@ -4,7 +4,7 @@ import { Modal, ModalConfig } from '@arco-design/web-vue';
 
 export const ss = initStorage('session');
 
-export const ls = initStorage('local');
+export const ls = initStorage();
 
 //格式化时间
 export const format = (time: Date, format: string = 'YYYY/MM/DD hh:mm:ss') => {
@@ -25,6 +25,7 @@ export const warning = (config: ModalConfig) => {
   });
 };
 
+//压缩图像
 export const compressImage = (
   file: File,
   maxWidth: number,

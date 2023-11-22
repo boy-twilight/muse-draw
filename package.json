@@ -21,7 +21,7 @@
     "@antv/x6-plugin-transform": "^2.1.8",
     "dayjs": "^1.11.10",
     "lodash-es": "^4.17.21",
-    "lyc-storage": "^1.0.4",
+    "lyc-storage": "^1.0.7",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.7",
     "uuid": "^9.0.1",

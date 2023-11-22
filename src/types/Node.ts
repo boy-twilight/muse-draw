@@ -1,3 +1,6 @@
+import { SelectOption } from '@arco-design/web-vue';
+import { RadioOption } from '@arco-design/web-vue/es/radio/interface';
+
 export interface UserData {
   id: string;
   name: string;
@@ -58,9 +61,12 @@ export interface GraphProperty {
   edgeMovable: boolean;
   edgeLabelMovable: boolean;
   arrowheadMovable: boolean;
+  //顶点
   vertexMovable: boolean;
   vertexAddable: boolean;
   vertexDeletable: boolean;
+  //线条类型
+  lineType: string;
   //起点箭头类型
   sourceMarker: string;
   //终点箭头类型
@@ -71,10 +77,44 @@ export interface GraphProperty {
   connector: string;
   //自动吸附
   snap: number;
-  //线条类型
-  lineType: string;
   //边上工具
   lineTools: string[];
   //节点工具
   nodeTools: string[];
+}
+
+export type SwitchSetting = Pick<
+  GraphProperty,
+  | 'embedding'
+  | 'allowLoop'
+  | 'allowBlank'
+  | 'allowLoop'
+  | 'allowMulti'
+  | 'allowPort'
+  | 'allowNode'
+  | 'allowEdge'
+  | 'highlight'
+  | 'nodeMovable'
+  | 'edgeMovable'
+  | 'edgeLabelMovable'
+  | 'arrowheadMovable'
+>;
+
+export type LineSetting = Pick<
+  GraphProperty,
+  'sourceMarker' | 'targetMarker' | 'router' | 'connector' | 'lineType'
+>;
+
+export interface FormSwitchItem {
+  label: string;
+  field: string;
+  tooltip: string;
+}
+
+export interface FormInputItem {
+  label: string;
+  field: string;
+  tooltip: string;
+  htmlType: 'radio' | 'select';
+  options: SelectOption[] | RadioOption[];
 }

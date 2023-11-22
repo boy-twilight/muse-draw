@@ -77,180 +77,30 @@
           show-input />
       </div>
     </a-form-item>
-    <a-form-item
-      label="画布平移"
-      field="panning">
-      <Switch v-model="graph.panning" />
-    </a-form-item>
-    <a-form-item field="embedding">
-      <template #label>
-        <div class="label">
-          <span>节点嵌套</span>
-          <a-tooltip
-            content="是否允许一个节点在另外一个节点内部成为子节点，默认为true。">
-            <IconInfoCircle />
-          </a-tooltip>
-        </div>
-      </template>
-      <Switch v-model="graph.embedding" />
-    </a-form-item>
-    <a-form-item field="allowBlank">
-      <template #label>
-        <div class="label">
-          <span>空白连接</span>
-          <a-tooltip content="是否允许连接到画布空白位置的点，默认为true。">
-            <IconInfoCircle />
-          </a-tooltip>
-        </div>
-      </template>
-      <Switch v-model="graph.allowBlank" />
-    </a-form-item>
-    <a-form-item field="allowBlank">
-      <template #label>
-        <div class="label">
-          <span>空白连接</span>
-          <a-tooltip content="是否允许连接到画布空白位置的点，默认为true。">
-            <IconInfoCircle />
-          </a-tooltip>
-        </div>
-      </template>
-      <Switch v-model="graph.allowBlank" />
-    </a-form-item>
-    <a-form-item field="allowLoop">
-      <template #label>
-        <div class="label">
-          <span>循环连接</span>
-          <a-tooltip
-            content="是否允许创建循环连线，即边的起始节点和终止节点为同一节点，默认为true。">
-            <IconInfoCircle />
-          </a-tooltip>
-        </div>
-      </template>
-      <Switch v-model="graph.allowLoop" />
-    </a-form-item>
-    <a-form-item field="allowMulti">
-      <template #label>
-        <div class="label">
-          <span>多边连接</span>
-          <a-tooltip
-            content="是否允许在相同的起始节点和终止之间创建多条边，默认为true。
-            当设置为 false 时，在起始和终止节点之间只允许创建一条边。">
-            <IconInfoCircle />
-          </a-tooltip>
-        </div>
-      </template>
-      <Switch v-model="graph.allowMulti" />
-    </a-form-item>
-    <a-form-item field="highlight">
-      <template #label>
-        <div class="label">
-          <span>连接高光</span>
-          <a-tooltip
-            content="拖动边时，是否高亮显示所有可用的连接桩或节点，默认值为false。">
-            <IconInfoCircle />
-          </a-tooltip>
-        </div>
-      </template>
-      <Switch v-model="graph.highlight" />
-    </a-form-item>
-    <a-form-item field="nodeMovable">
-      <template #label>
-        <div class="label">
-          <span>节点拖拽</span>
-          <a-tooltip content="节点是否可以被移动，默认值为true">
-            <IconInfoCircle />
-          </a-tooltip>
-        </div>
-      </template>
-      <Switch v-model="graph.nodeMovable" />
-    </a-form-item>
-    <a-form-item field="edgeMovable">
-      <template #label>
-        <div class="label">
-          <span>边拖拽</span>
-          <a-tooltip content="边是否可以被移动，默认值为true。">
-            <IconInfoCircle />
-          </a-tooltip>
-        </div>
-      </template>
-      <Switch v-model="graph.edgeMovable" />
-    </a-form-item>
-    <a-form-item field="edgeMovable">
-      <template #label>
-        <div class="label">
-          <span>边标签拖拽</span>
-          <a-tooltip content="边的标签是否可以被移动，默认值为true。">
-            <IconInfoCircle />
-          </a-tooltip>
-        </div>
-      </template>
-      <Switch v-model="graph.edgeLabelMovable" />
-    </a-form-item>
-    <a-form-item field="arrowheadMovable">
-      <template #label>
-        <div class="label">
-          <span>箭头拖拽</span>
-          <a-tooltip content="边的起始/终止箭头是否可以被移动，默认值为true。">
-            <IconInfoCircle />
-          </a-tooltip>
-        </div>
-      </template>
-      <Switch v-model="graph.arrowheadMovable" />
-    </a-form-item>
     <span class="title">线条属性：</span>
+    <!-- vfor渲染 -->
     <a-form-item
-      label="线条类型"
-      field="lineType">
-      <a-radio-group v-model="graph.lineType">
-        <a-radio value="">实线</a-radio>
-        <a-radio value="7,7">虚线</a-radio>
-      </a-radio-group>
-    </a-form-item>
-    <a-form-item
-      label="起点箭头"
-      field="sourceMarker">
-      <a-select
-        v-model="graph.sourceMarker"
-        placeholder="请选择起点箭头类型"
-        :options="markerOptions" />
-    </a-form-item>
-    <a-form-item
-      label="终点箭头"
-      field="targetMarker">
-      <a-select
-        v-model="graph.targetMarker"
-        placeholder="请选择终点箭头类型"
-        :options="markerOptions" />
-    </a-form-item>
-    <a-form-item field="router">
+      v-for="item in inputItem"
+      :key="item.field"
+      :field="item.field">
       <template #label>
         <div class="label">
-          <span>路由模式</span>
+          <span>{{ item.label }}</span>
           <a-tooltip
-            content="路由将边的路径点 vertices 做进一步转换处理，并在必要时添加额外的点，然后返回处理后的点（不包含边的起点和终点）。例如，经过 orth 路由处理后，边的每一条线段都是水平或垂直的正交线段，默认为	智能正交路由。">
+            v-if="item.tooltip"
+            :content="item.tooltip">
             <IconInfoCircle />
           </a-tooltip>
         </div>
       </template>
       <a-select
-        v-model="graph.router"
-        placeholder="请选择路由模式"
-        :options="routerOptions" />
-    </a-form-item>
-    <a-form-item field="connector">
-      <template #label>
-        <div class="label">
-          <span>连接器</span>
-          <a-tooltip
-            content="连接起点、终点、路有点的连线类型，默认值为圆角连接器">
-            <IconInfoCircle />
-          </a-tooltip>
-        </div>
-      </template>
-      <a-select
-        v-model="graph.connector"
-        placeholder="请选择连接器"
-        :options="connectorOptions" />
+        v-if="item.htmlType == 'select'"
+        v-model="graph[item.field as keyof LineSetting]"
+        :options="(item.options as SelectOption[])" />
+      <a-radio-group
+        v-else
+        v-model="graph[item.field as keyof LineSetting]"
+        :options="(item.options as RadioOption[])" />
     </a-form-item>
     <a-form-item field="snap">
       <template #label>
@@ -283,12 +133,38 @@
         v-model="graph.lineTools"
         :options="lineToolOptions" />
     </a-form-item>
+    <span class="title">连接属性：</span>
+    <!-- vfor渲染 -->
+    <a-form-item
+      v-for="item in switchItem"
+      :key="item.field"
+      :field="item.field">
+      <template #label>
+        <div class="label">
+          <span>{{ item.label }}</span>
+          <a-tooltip
+            :content="item.tooltip"
+            v-if="item.tooltip">
+            <IconInfoCircle />
+          </a-tooltip>
+        </div>
+      </template>
+      <Switch v-model="graph[item.field as keyof SwitchSetting]" />
+    </a-form-item>
   </a-form>
 </template>
 
 <script lang="ts" setup>
-import { GraphProperty } from '@/types/node';
-import { ref, toRefs } from 'vue';
+import {
+  GraphProperty,
+  FormSwitchItem,
+  SwitchSetting,
+  FormInputItem,
+  LineSetting,
+} from '@/types/node';
+import { RadioOption } from '@arco-design/web-vue/es/radio/interface';
+import { SelectOption, CheckboxOption, Message } from '@arco-design/web-vue';
+import { ref, toRefs, reactive } from 'vue';
 import { ColorPicker } from 'vue3-colorpicker';
 import 'vue3-colorpicker/style.css';
 import Switch from '../switch/index.vue';
@@ -297,7 +173,6 @@ import {
   IconBgColors,
   IconUpload,
 } from '@arco-design/web-vue/es/icon';
-import { SelectOption, CheckboxOption, Message } from '@arco-design/web-vue';
 import { compressImage } from '@/utils';
 
 const props = defineProps<{
@@ -306,6 +181,17 @@ const props = defineProps<{
 const { property } = toRefs(props);
 //画布属性
 const graph = ref<GraphProperty>(property.value);
+//线条类型选项
+const lineTypeOptions: RadioOption[] = [
+  {
+    label: '实线',
+    value: '',
+  },
+  {
+    label: '虚线',
+    value: '7,7',
+  },
+];
 //箭头选项
 const markerOptions: SelectOption[] = [
   {
@@ -423,6 +309,132 @@ const lineToolOptions: CheckboxOption[] = [
     value: 'segments',
   },
 ];
+//开关form表单
+const switchItem = reactive<FormSwitchItem[]>([
+  {
+    field: 'panning',
+    label: '画布平移',
+    tooltip: '',
+  },
+  {
+    field: 'embedding',
+    label: '节点嵌套',
+    tooltip: '是否允许一个节点在另外一个节点内部成为子节点，默认开启。',
+  },
+  {
+    field: 'allowPort',
+    label: '连接',
+    tooltip: '是否允许边链接到连接桩，默认开启。',
+  },
+
+  {
+    field: 'allowEdge',
+    label: '边边连接',
+    tooltip: '一条边连接另一条边，默认开启。',
+  },
+  {
+    field: 'allowBlank',
+    label: '空白连接',
+    tooltip: '是否允许连接到画布空白位置的点，默认开启。',
+  },
+  {
+    field: 'allowLoop',
+    label: '循环连接',
+    tooltip:
+      '是否允许创建循环连线，即边的起始节点和终止节点为同一节点，默认开启。',
+  },
+  {
+    field: 'allowMulti',
+    label: '节点多边连接',
+    tooltip:
+      '是否允许在相同的起始节点和终止之间创建多条边，默认开启。当关闭时，在起始和终止节点之间只允许创建一条边。',
+  },
+  {
+    field: 'allowNode',
+    label: '非连接桩连接',
+    tooltip: '是否允许边连接到节点（非节点上的连接桩），默认开启 。',
+  },
+  {
+    field: 'highlight',
+    label: '连接高光',
+    tooltip: '拖动边时，是否高亮显示所有可用的连接桩或节点，默认关闭。',
+  },
+
+  {
+    field: 'nodeMovable',
+    label: '节点拖拽',
+    tooltip: '节点是否可以被移动，默认开启。',
+  },
+  {
+    field: 'edgeMovable',
+    label: '边拖拽',
+    tooltip: '边是否可以被移动，默认开启。',
+  },
+  {
+    field: 'edgeLabelMovable',
+    label: '边标签拖拽',
+    tooltip: '边的标签是否可以被移动，默认开启。',
+  },
+  {
+    field: 'arrowheadMovable',
+    label: '箭头拖拽',
+    tooltip: '边的起始/终止箭头是否可以被移动，默认开启。',
+  },
+  {
+    field: 'vertexMovable',
+    label: '路径点拖拽',
+    tooltip: '边的路径点是否可以被移动，默认开启。',
+  },
+  {
+    field: 'vertexAddable',
+    label: '添加路径点',
+    tooltip: '是否可以添加边的路径点，默认开启。',
+  },
+  {
+    field: 'vertexDeletable',
+    label: '删除路径点',
+    tooltip: ' 边的路径点是否可以被删除，默认开启。',
+  },
+]);
+//线条select、radio表单
+const inputItem = ref<FormInputItem[]>([
+  {
+    label: '线条类型',
+    field: 'lineType',
+    tooltip: '',
+    htmlType: 'radio',
+    options: lineTypeOptions,
+  },
+  {
+    label: '起点箭头',
+    field: 'sourceMarker',
+    tooltip: '',
+    htmlType: 'select',
+    options: markerOptions,
+  },
+  {
+    label: '终点箭头',
+    field: 'targetMarker',
+    tooltip: '',
+    htmlType: 'select',
+    options: markerOptions,
+  },
+  {
+    label: '路由模式',
+    field: 'router',
+    tooltip:
+      '路由将边的路径点做进一步转换处理，并在必要时添加额外的点，然后返回处理后的点（不包含边的起点和终点）。例如，经过正交路由路由处理后，边的每一条线段都是水平或垂直的正交线段，默认为	智能正交路由。',
+    htmlType: 'select',
+    options: routerOptions,
+  },
+  {
+    label: '连接器',
+    field: 'connector',
+    tooltip: '连接起点、终点、路有点的连线类型，默认为圆角连接器。',
+    htmlType: 'select',
+    options: connectorOptions,
+  },
+]);
 
 //上传图像
 const uploadImage = () => {
